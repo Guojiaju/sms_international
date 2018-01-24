@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsChannelMapper">
+
+	<resultMap type="com.sms.international.admin.model.SmsChannel" id="baseResultMap">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="gateway_template" property="gatewayTemplate" jdbcType="INTEGER"/>
+        <result column="gateway_port" property="gatewayPort" jdbcType="INTEGER"/>
+        <result column="gateway_ip" property="gatewayIp" jdbcType="VARCHAR"/>
+        <result column="gateway_account" property="gatewayAccount" jdbcType="VARCHAR"/>
+        <result column="gateway_pass" property="gatewayPass" jdbcType="VARCHAR"/>
+        <result column="gateway_url" property="gatewayUrl" jdbcType="VARCHAR"/>
+        <result column="local_ip" property="localIp" jdbcType="VARCHAR"/>
+        <result column="local_delay" property="localDelay" jdbcType="INTEGER"/>
+        <result column="local_read_num" property="localReadNum" jdbcType="INTEGER"/>
+        <result column="rabbit_port" property="rabbitPort" jdbcType="INTEGER"/>
+        <result column="rabbit_ip" property="rabbitIp" jdbcType="VARCHAR"/>
+        <result column="rabbit_account" property="rabbitAccount" jdbcType="VARCHAR"/>
+        <result column="rabbit_pass" property="rabbitPass" jdbcType="VARCHAR"/>
+        <result column="channel_name" property="channelName" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="price" property="price" jdbcType="DECIMAL"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="channel_provider" property="channelProvider" jdbcType="VARCHAR" />
+        <result column="sign_position" property="signPosition" jdbcType="INTEGER" />
+        <result column="record_type" property="recordType" jdbcType="INTEGER" />
+    </resultMap>
+    
+    <sql id="user_Where">
+        <where>
+        	<if test="id != null">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="channelName != null and channelName != ''">
+	    		and channel_name = #{channelName,jdbcType=VARCHAR}
+	    	</if>
+            <if test="gatewayTemplate != null">
+                and gateway_template = #{gatewayTemplate,jdbcType=INTEGER}
+            </if>
+            <if test="status != null">
+                and status = #{status,jdbcType=INTEGER}
+            </if>
+        </where>
+    </sql>
+
+    <sql id="columns">
+        id,gateway_template,gateway_port,gateway_ip,gateway_account,gateway_pass,
+          gateway_url,local_ip,local_delay,local_read_num,rabbit_port,rabbit_ip,
+          rabbit_account,rabbit_pass,channel_name,status,remark,channel_provider,sign_position,record_type
+    </sql>
+
+    <select id="getAll" parameterType="com.sms.international.admin.model.SmsChannel" resultMap="baseResultMap">
+        select
+         <include refid="columns"></include>
+        from gateway_channel
+		<include refid="user_Where"></include>
+    </select>
+
+	<select id="countTotal" parameterType="com.sms.international.admin.model.SmsChannel" resultType="java.lang.Integer">
+    select count(0) from gateway_channel 
+    <include refid="user_Where"></include>
+  	</select>
+  	
+  	<select id="findOne" parameterType="java.lang.Integer" resultMap="baseResultMap">
+    select
+        <include refid="columns"></include>
+      from gateway_channel
+      where id = #{id,jdbcType=INTEGER}
+  	</select>
+  	
+  	<select id="findAll" parameterType="com.sms.international.admin.model.SmsChannel" resultMap="baseResultMap">
+    select
+        <include refid="columns"></include>
+      from gateway_channel
+      <include refid="user_Where"></include>
+		order by id asc
+    <if test="currentPageIndex != null">
+    limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+    </if>
+  </select>
+  
+  <delete id="deleteById" parameterType="java.lang.Integer">
+    delete from gateway_channel
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="save" parameterType="com.sms.international.admin.model.SmsChannel">
+  	<selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+        SELECT @@IDENTITY
+    </selectKey>
+    insert into gateway_channel 
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="gatewayTemplate != null">
+        gateway_template,
+      </if>
+      <if test="gatewayPort != null">
+        gateway_port,
+      </if>
+      <if test="gatewayIp != null and gatewayIp != ''">
+        gateway_ip,
+      </if>
+      <if test="gatewayAccount != null and gatewayAccount != ''">
+        gateway_account,
+      </if>
+      <if test="gatewayPass != null and gatewayPass != ''">
+        gateway_pass,
+      </if>
+      <if test="gatewayUrl != null and gatewayUrl != ''">
+        gateway_url,
+      </if>
+      <if test="localIp != null and localIp != ''">
+        local_ip,
+      </if>
+      <if test="localDelay != null">
+        local_delay,
+      </if>
+      <if test="localReadNum != null">
+        local_read_num,
+      </if>
+      <if test="rabbitPort != null">
+        rabbit_port,
+      </if>
+      <if test="rabbitIp != null and rabbitIp != ''">
+        rabbit_ip,
+      </if>
+      <if test="rabbitAccount != null and rabbitAccount != ''">
+        rabbit_account,
+      </if>
+      <if test="rabbitPass != null and rabbitPass != ''">
+        rabbit_pass,
+      </if>
+      <if test="channelName != null and channelName != ''">
+        channel_name,
+      </if>
+      <if test="status != null">
+    	status,
+      </if>
+      <if test="price !=null">
+        price,
+      </if>
+      <if test="remark !=null and remark !=''">
+        remark,
+      </if>
+        <if test="channelProvider !=null and channelProvider !=''">
+            channel_provider,
+        </if>
+        <if test="recordType !=null">
+            record_type,
+        </if>
+        <if test="signPosition !=null">
+            sign_position,
+        </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="gatewayTemplate != null">
+        #{gatewayTemplate,jdbcType=INTEGER},
+      </if>
+      <if test="gatewayPort != null">
+        #{gatewayPort,jdbcType=INTEGER},
+      </if>
+      <if test="gatewayIp != null and gatewayIp != ''">
+        #{gatewayIp,jdbcType=VARCHAR},
+      </if>
+      <if test="gatewayAccount != null and gatewayAccount != ''">
+        #{gatewayAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="gatewayPass != null and gatewayPass != ''">
+        #{gatewayPass,jdbcType=VARCHAR},
+      </if>
+      <if test="gatewayUrl != null and gatewayUrl != ''">
+        #{gatewayUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="localIp != null and localIp != ''">
+        #{localIp,jdbcType=VARCHAR},
+      </if>
+      <if test="localDelay != null">
+        #{localDelay,jdbcType=INTEGER},
+      </if>
+      <if test="localReadNum != null">
+        #{localReadNum,jdbcType=INTEGER},
+      </if>
+      <if test="rabbitPort != null">
+        #{rabbitPort,jdbcType=INTEGER},
+      </if>
+      <if test="rabbitIp != null and rabbitIp != ''">
+        #{rabbitIp,jdbcType=VARCHAR},
+      </if>
+      <if test="rabbitAccount != null and rabbitAccount != ''">
+        #{rabbitAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="rabbitPass != null and rabbitPass != ''">
+        #{rabbitPass,jdbcType=VARCHAR},
+      </if>
+      <if test="channelName != null and channelName != ''">
+        #{channelName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="price !=null">
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="remark !=null and remark != ''">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+        <if test="channelProvider !=null and channelProvider !=''">
+            #{channelProvider,jdbcType=VARCHAR},
+        </if>
+        <if test="recordType !=null">
+            #{recordType,jdbcType=INTEGER},
+        </if>
+        <if test="signPosition !=null">
+            #{signPosition,jdbcType=INTEGER},
+        </if>
+    </trim>
+  </insert>
+  
+  <update id="update" parameterType="com.sms.international.admin.model.SmsChannel">
+    update gateway_channel 
+    <set>
+      <if test="gatewayTemplate != null">
+        gateway_template = #{gatewayTemplate,jdbcType=INTEGER},
+      </if>
+      <if test="gatewayPort != null">
+        gateway_port = #{gatewayPort,jdbcType=INTEGER},
+      </if>
+      <if test="gatewayIp != null and gatewayIp != ''">
+        gateway_ip = #{gatewayIp,jdbcType=VARCHAR},
+      </if>
+      <if test="gatewayAccount != null and gatewayAccount != ''">
+        gateway_account = #{gatewayAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="gatewayPass != null and gatewayPass != ''">
+        gateway_pass = #{gatewayPass,jdbcType=VARCHAR},
+      </if>
+      <if test="gatewayUrl != null and gatewayUrl != ''">
+        gateway_url = #{gatewayUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="localIp != null and localIp != ''">
+        local_ip = #{localIp,jdbcType=VARCHAR},
+      </if>
+      <if test="localDelay != null">
+        local_delay = #{localDelay,jdbcType=INTEGER},
+      </if>
+      <if test="localReadNum != null">
+        local_read_num = #{localReadNum,jdbcType=INTEGER},
+      </if>
+      <if test="rabbitPort != null">
+        rabbit_port = #{rabbitPort,jdbcType=INTEGER},
+      </if>
+      <if test="rabbitIp != null and rabbitIp != ''">
+        rabbit_ip = #{rabbitIp,jdbcType=VARCHAR},
+      </if>
+      <if test="rabbitAccount != null and rabbitAccount != ''">
+        rabbit_account = #{rabbitAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="rabbitPass != null and rabbitPass != ''">
+        rabbit_pass = #{rabbitPass,jdbcType=VARCHAR},
+      </if>
+      <if test="channelName != null and channelName != ''">
+        channel_name = #{channelName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="price !=null">
+        price =#{price,jdbcType=DECIMAL},
+      </if>
+      <if test="remark !=null">
+        remark =#{remark,jdbcType=VARCHAR},
+      </if>
+        <if test="channelProvider !=null and channelProvider !=''">
+            channel_provider =#{channelProvider,jdbcType=VARCHAR},
+        </if>
+        <if test="recordType !=null">
+            record_type =#{recordType,jdbcType=INTEGER},
+        </if>
+        <if test="signPosition !=null">
+            sign_position =#{signPosition,jdbcType=INTEGER}
+        </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

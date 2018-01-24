@@ -1,0 +1,15 @@
+.ml-25{
+    margin-left: -25px;
+}
+.mt-9{
+    margin-top: -9px;
+}
+.text-left{
+    text-align: left;
+}
+.layui-table tbody tr td {
+    word-wrap: break-word;
+    word-break: break-all;
+    vertical-align: middle;
+    text-align: center;
+}

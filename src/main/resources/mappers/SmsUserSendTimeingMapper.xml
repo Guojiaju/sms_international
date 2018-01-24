@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sms.international.admin.mapper.SmsUserSendTimeingMapper">
+    <resultMap id="baseResultMap" type="com.sms.international.admin.model.SmsUserSendTimeing">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="mtype" jdbcType="SMALLINT" property="mtype"/>
+        <result column="sendtime" jdbcType="BIGINT" property="sendtime"/>
+        <result column="submitTime" jdbcType="BIGINT" property="submitTime"/>
+        <result column="uid" jdbcType="INTEGER" property="uid"/>
+        <result column="channel" jdbcType="SMALLINT" property="channel"/>
+        <result column="content_num" jdbcType="SMALLINT" property="contentNum"/>
+        <result column="mobile_num" jdbcType="INTEGER" property="mobileNum"/>
+        <result column="stat" jdbcType="SMALLINT" property="stat"/>
+        <result column="isrelease" jdbcType="SMALLINT" property="isrelease"/>
+        <result column="pid" jdbcType="INTEGER" property="pid"/>
+        <result column="mobile" jdbcType="BIGINT" property="mobile"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="period" jdbcType="SMALLINT" property="period"/>
+        <result column="periodNum" jdbcType="SMALLINT" property="period_num"/>
+    </resultMap>
+
+	<sql id="user_Where">
+        <where>
+        	<if test="id != null">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="mtype != null">
+                and mtype = #{mtype,jdbcType=SMALLINT}
+            </if>
+            <if test="startTime != null">
+                and sendtime &gt;= #{startTime,jdbcType=BIGINT}
+            </if>
+            <if test="endTime != null">
+                and sendtime &lt;= #{endTime,jdbcType=BIGINT}
+            </if>
+            <if test="uid != null">
+                and uid = #{uid,jdbcType=INTEGER}
+            </if>
+            <if test="channel != null">
+                and channel = #{channel,jdbcType=SMALLINT}
+            </if>
+            <if test="pid != null">
+                and pid = #{pid,jdbcType=SMALLINT}
+            </if>
+            <if test="content != null and content != ''">
+                and content LIKE CONCAT(CONCAT('%', #{content,jdbcType=VARCHAR}), '%')
+            </if>
+            <if test="mobile != null">
+                and mobile = #{mobile,jdbcType=BIGINT}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findToBatch" parameterType="com.sms.international.admin.model.SmsUserSendTimeing" resultMap="baseResultMap">
+     select pid,sendtime,uid,submitTime,content,COUNT(0) mobile_num from sms_user_send_timeing where 1=1
+			<if test="uid != null">
+                and uid = #{uid,jdbcType=INTEGER}
+            </if>
+            <if test="mtype != null">
+                and mtype = #{mtype,jdbcType=SMALLINT}
+            </if>
+            <if test="startTime != null">
+                and sendtime &gt;= #{startTime,jdbcType=BIGINT}
+            </if>
+            <if test="endTime != null">
+                and sendtime &lt;= #{endTime,jdbcType=BIGINT}
+            </if>
+            <if test="channel != null">
+                and channel = #{channel,jdbcType=SMALLINT}
+            </if>
+            <if test="content != null and content != ''">
+                and content LIKE CONCAT(CONCAT('%', #{content,jdbcType=VARCHAR}), '%')
+            </if>
+            <if test="mobile != null">
+                and mobile = #{mobile,jdbcType=BIGINT}
+            </if>
+ AND  pid in(select pid from(select pid from sms_user_send_timeing
+		<where>
+			<if test="uid != null">
+                and uid = #{uid,jdbcType=INTEGER}
+            </if>
+			<if test="mtype != null">
+                and mtype = #{mtype,jdbcType=SMALLINT}
+            </if>
+            <if test="startTime != null">
+                and sendtime &gt;= #{startTime,jdbcType=BIGINT}
+            </if>
+            <if test="startTime != null">
+                and sendtime &lt;= #{endTime,jdbcType=BIGINT}
+            </if>
+            <if test="channel != null">
+                and channel = #{channel,jdbcType=SMALLINT}
+            </if>
+            <if test="content != null and content != ''">
+                and content LIKE CONCAT(CONCAT('%', #{content,jdbcType=VARCHAR}), '%')
+            </if>
+            <if test="mobile != null">
+                and mobile = #{mobile,jdbcType=BIGINT}
+            </if></where>
+GROUP BY pid
+            <if test="currentPageIndex != null">
+            limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+        )as cd) GROUP BY pid order by pid desc;
+    </select>
+<select id="findByT" parameterType="com.sms.international.admin.model.SmsUserSendTimeing" resultMap="baseResultMap">
+     select mobile from sms_user_send_timeing
+      <include refid="user_Where"></include>
+      order by id desc
+            <if test="currentPageIndex != null">
+            limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
+	<select id="findByList" parameterType="com.sms.international.admin.model.SmsUserSendTimeing" resultMap="baseResultMap">
+     select sendtime,submitTime,mobile,content,period,periodNum from sms_user_send_timeing
+      <include refid="user_Where"></include>
+      order by id desc
+            <if test="currentPageIndex != null">
+            limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <delete id="clearByPid">
+        DELETE FROM sms_user_send_timeing WHERE pid = #{pid}
+    </delete>
+
+    <select id="countTotalToBatch" parameterType="com.sms.international.admin.model.SmsUserSendTimeing" resultType="java.lang.Integer">
+		select count(t.pid) from(select pid from sms_user_send_timeing
+		<where>
+			<if test="uid != null">
+                and uid = #{uid,jdbcType=INTEGER}
+            </if>
+			<if test="mtype != null">
+                and mtype = #{mtype,jdbcType=SMALLINT}
+            </if>
+            <if test="startTime != null">
+                and sendtime &gt;= #{startTime,jdbcType=BIGINT}
+            </if>
+            <if test="endTime != null">
+                and sendtime &lt;= #{endTime,jdbcType=BIGINT}
+            </if>
+            <if test="channel != null">
+                and channel = #{channel,jdbcType=SMALLINT}
+            </if>
+            <if test="content != null and content != ''">
+                and content LIKE CONCAT(CONCAT('%', #{content,jdbcType=VARCHAR}), '%')
+            </if>
+            <if test="mobile != null">
+                and mobile = #{mobile,jdbcType=BIGINT}
+            </if>
+          </where>
+        group by pid) t;
+    </select>
+
+	<select id="countTotal" parameterType="com.sms.international.admin.model.SmsUserSendTimeing" resultType="java.lang.Integer">
+        select count(0) from sms_user_send_timeing
+        <include refid="user_Where"/>
+    </select>
+
+	<insert id="batchInsert" parameterType="java.util.List">
+		<selectKey resultType="java.lang.Integer" keyColumn="id" order="AFTER">
+          select @@IDENTITY
+        </selectKey>
+		insert into sms_user_send_timeing (mtype, sendtime, submitTime,uid,mobile,channel,content,content_num,mobile_num,stat,isrelease,pid,period,period_num)
+    	values
+	  	<foreach collection="list" item="item" index="index" separator=",">
+	  		(
+	  		#{item.mtype,jdbcType=SMALLINT},
+	  		#{item.sendtime,jdbcType=BIGINT},
+	  		#{item.submitTime,jdbcType=BIGINT},
+	  		#{item.uid,jdbcType=INTEGER},
+	  		#{item.mobile,jdbcType=BIGINT},
+	  		#{item.channel,jdbcType=SMALLINT},
+	  		#{item.content,jdbcType=VARCHAR},
+	  		#{item.contentNum,jdbcType=SMALLINT},
+	  		#{item.mobileNum,jdbcType=INTEGER},
+	  		#{item.stat,jdbcType=SMALLINT},
+	  		#{item.isrelease,jdbcType=SMALLINT},
+	  		#{item.pid,jdbcType=INTEGER},
+	  		#{item.period,jdbcType=SMALLINT},
+	  		#{item.periodNum,jdbcType=SMALLINT}
+	  		)
+	  	</foreach>
+	</insert>
+</mapper>

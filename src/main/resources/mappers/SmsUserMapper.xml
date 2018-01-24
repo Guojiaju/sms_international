@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsUserMapper">
+    <resultMap id="smsUser" type="com.sms.international.admin.model.SmsUser">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="pwd" jdbcType="VARCHAR" property="pwd"/>
+        <result column="dpwd" jdbcType="VARCHAR" property="dpwd"/>
+        <result column="company" jdbcType="VARCHAR" property="company"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="tel" jdbcType="VARCHAR" property="tel"/>
+        <result column="mail" jdbcType="VARCHAR" property="mail"/>
+        <result column="linkman" jdbcType="VARCHAR" property="linkman"/>
+        <result column="sales" jdbcType="VARCHAR" property="sales"/>
+        <result column="time" jdbcType="VARCHAR" property="time"/>
+        <result column="add_uid" jdbcType="VARCHAR" property="addUid"/>
+        <result column="stat" jdbcType="SMALLINT" property="stat"/>
+        <result column="sms" jdbcType="DOUBLE" property="sms"/>
+        <result column="priority" jdbcType="SMALLINT" property="priority"/>
+        <result column="qq" jdbcType="VARCHAR" property="qq"/>
+        <result column="userkind" jdbcType="SMALLINT" property="userkind"/>
+        <result column="kefu" jdbcType="VARCHAR" property="kefu"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="submittype" jdbcType="TINYINT" property="submittype"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="parentId" jdbcType="INTEGER" property="parentId"/>
+        <result column="usertype" jdbcType="INTEGER" property="usertype"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="paytype" jdbcType="INTEGER" property="paytype"/>
+    </resultMap>
+
+    <insert id="save" parameterType="com.sms.international.admin.model.SmsUser">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+            SELECT @@IDENTITY
+        </selectKey>
+        insert into sioo_sms_international.sms_user
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null and id > 0">
+                id,
+            </if>
+            <if test="pwd != null and pwd != ''">
+                pwd,
+            </if>
+            <if test="dpwd != null and dpwd != ''">
+                dpwd,
+            </if>
+            <if test="company != null and company != ''">
+                company,
+            </if>
+            <if test="phone != null and phone != ''">
+                phone,
+            </if>
+            <if test="tel != null and tel != ''">
+                tel,
+            </if>
+            <if test="mail != null and mail !=''">
+                mail,
+            </if>
+            <if test="linkman != null and linkman !=''">
+                linkman,
+            </if>
+            <if test="address != null and address !=''">
+                address,
+            </if>
+            <if test="sales != null and sales !=''">
+                sales,
+            </if>
+            <if test="time != null and time !=''">
+                time,
+            </if>
+            <if test="addUid != null and addUid !=''">
+                add_uid,
+            </if>
+            <if test="stat != null">
+                stat,
+            </if>
+            <if test="sms != null">
+                sms,
+            </if>
+            <if test="priority != null">
+                priority,
+            </if>
+            <if test="qq != null and qq !=''">
+                qq,
+            </if>
+            <if test="remark != null and remark !=''">
+                remark,
+            </if>
+            <if test="userkind != null">
+                userkind,
+            </if>
+            <if test="kefu != null and kefu !=''">
+                kefu,
+            </if>
+            <if test="username != null and username !=''">
+                username,
+            </if>
+            <if test="submittype != null">
+                submittype,
+            </if>
+            <if test="parentId != null">
+                parentId,
+            </if>
+            <if test="customerId != null">
+                customer_id,
+            </if>
+            <if test="usertype != null">
+                usertype,
+            </if>
+            <if test="paytype != null">
+                paytype,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null and id > 0">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="pwd != null and pwd != ''">
+                #{pwd,jdbcType=VARCHAR},
+            </if>
+            <if test="dpwd != null and dpwd != ''">
+                #{dpwd,jdbcType=VARCHAR},
+            </if>
+            <if test="company != null and company != ''">
+                #{company,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null and phone != ''">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="tel != null and tel != ''">
+                #{tel,jdbcType=VARCHAR},
+            </if>
+            <if test="mail != null and mail !=''">
+                #{mail,jdbcType=VARCHAR},
+            </if>
+            <if test="linkman != null and linkman !=''">
+                #{linkman,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null and address !=''">
+                #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="sales != null and sales !=''">
+                #{sales,jdbcType=VARCHAR},
+            </if>
+            <if test="time != null and time !=''">
+                #{time,jdbcType=VARCHAR},
+            </if>
+            <if test="addUid != null and addUid !=''">
+                #{addUid,jdbcType=VARCHAR},
+            </if>
+            <if test="stat != null">
+                #{stat,javaType=INTEGER},
+            </if>
+            <if test="sms != null">
+                #{sms,javaType=INTEGER},
+            </if>
+            <if test="priority != null">
+                #{priority,javaType=INTEGER},
+            </if>
+            <if test="qq != null and qq !=''">
+                #{qq,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark != ''">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="userkind != null">
+                #{userkind,javaType=INTEGER},
+            </if>
+            <if test="kefu != null and kefu !=''">
+                #{kefu,jdbcType=VARCHAR},
+            </if>
+            <if test="username != null and username !=''">
+                #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="submittype != null">
+                #{submittype,javaType=INTEGER},
+            </if>
+            <if test="parentId != null">
+                #{parentId,javaType=INTEGER},
+            </if>
+            <if test="customerId != null">
+                #{customerId,javaType=INTEGER},
+            </if>
+            <if test="usertype != null">
+                #{usertype,javaType=INTEGER},
+            </if>
+            <if test="paytype != null">
+            	#{paytype,javaType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.sms.international.admin.model.SmsUser">
+        update sioo_sms_international.sms_user
+        <set>
+            <if test="pwd != null and pwd != ''">
+                pwd=#{pwd,jdbcType=VARCHAR},
+            </if>
+            <if test="dpwd != null and dpwd != ''">
+                dpwd=#{dpwd,jdbcType=VARCHAR},
+            </if>
+            <if test="company != null and company != ''">
+                company=#{company,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone=#{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="tel != null and tel != ''">
+                tel= #{tel,jdbcType=VARCHAR},
+            </if>
+            <if test="mail !=null and mail != ''">
+                mail=#{mail,jdbcType=VARCHAR},
+            </if>
+            <if test="linkman !=null and linkman != ''">
+                linkman= #{linkman,jdbcType=VARCHAR},
+            </if>
+            <if test="address !=null and address != ''">
+                address=#{address,jdbcType=VARCHAR},
+            </if>
+            <if test="sales != null and sales !=''">
+                sales=#{sales,jdbcType=VARCHAR},
+            </if>
+            <if test="time != null and time != ''">
+                time=#{time,jdbcType=VARCHAR},
+            </if>
+            <if test="addUid != null and addUid != ''">
+                add_uid=#{addUid,jdbcType=VARCHAR},
+            </if>
+            <if test="stat !=null">
+                stat=#{stat,javaType=INTEGER},
+            </if>
+            <if test="sms !=null">
+                sms=#{sms,javaType=DOUBLE},
+            </if>
+            <if test="priority !=null">
+                priority=#{priority,javaType=INTEGER},
+            </if>
+            <if test="qq != null and qq != ''">
+                qq=#{qq,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark=#{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="userkind != null">
+                userkind=#{userkind,javaType=INTEGER},
+            </if>
+            <if test="kefu != null and kefu !=''">
+                kefu=#{kefu,jdbcType=VARCHAR},
+            </if>
+            <if test="username != null and username !=''">
+                username=#{username,jdbcType=VARCHAR},
+            </if>
+            <if test="submittype != null">
+                submittype=#{submittype,javaType=INTEGER},
+            </if>
+            <if test="parentId != null">
+                parentId=#{parentId,javaType=INTEGER},
+            </if>
+            <if test="customerId != null">
+                customer_id = #{customerId,javaType=INTEGER},
+            </if>
+            <if test="usertype != null">
+                usertype = #{usertype,javaType=INTEGER},
+            </if>
+            <if test="paytype !=null">
+                paytype = #{paytype,javaType=INTEGER},
+            </if>
+        </set>
+          where id = #{id,javaType=INTEGER}
+    </update>
+
+    <sql id="userlist_Where">
+        <where>
+            <if test="id!=null">
+                id=#{id,javaType=INTEGER}
+            </if>
+            <if test="sms!=null">
+                and sms &lt;=#{sms,javaType=DOUBLE}
+            </if>
+            <if test="username != null and username != ''">
+                and username like CONCAT(CONCAT('%',trim(#{username,jdbcType=VARCHAR})),'%')
+            </if>
+            <if test="company!=null and company!=''">
+                and company like CONCAT(CONCAT('%',#{company,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="address!=null and address!=''">
+                and address like CONCAT(CONCAT('%',#{address,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="linkman!=null and linkman!=''">
+                and linkman like CONCAT(CONCAT('%',#{linkman,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="kefu!=null and kefu!=''">
+                and kefu like CONCAT(CONCAT('%',#{kefu,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="sales!=null and sales!=''">
+                and sales like CONCAT(CONCAT('%',#{sales,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="qq!=null and qq!=''">
+                and qq like CONCAT(CONCAT('%',#{qq,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="phone!=null and phone!=''">
+                and phone like CONCAT(CONCAT('%',#{phone,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="tel!=null and tel!=''">
+                and tel like CONCAT(CONCAT('%',#{tel,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="userkind != null">
+                and userkind =#{userkind,javaType=INTEGER}
+            </if>
+            <if test="parentId !=null">
+                and parentId =#{parentId,javaType=INTEGER}
+            </if>
+            <if test="stat !=null">
+                and stat =#{stat,javaType=INTEGER}
+            </if>
+            <if test="paytype != null">
+            	and paytype = #{paytype,javaType=INTEGER}
+            </if>
+            <if test="usertype !=null" >
+                and usertype =#{usertype,javaType=INTEGER}
+            </if>
+            <if test ="submittype !=null">
+                and submittype =#{submittype,javaType=INTEGER}
+            </if>
+            <if test="ids != null">
+                and id in
+                <foreach item="item" index="index" collection="ids" open="("
+                         separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </sql>
+    <select id="findByT" parameterType="com.sms.international.admin.model.SmsUser"
+            resultType="com.sms.international.admin.model.SmsUser">
+        select s.id,s.dpwd,s.pwd,s.company,s.phone,s.tel,s.mail,s.linkman,s.address,s.sales,s.time,s.add_uid,s.stat,s.sms,s.priority,s.qq,s.remark,s.userkind,s.kefu,s.username,s.submittype,s.parentId,s.usertype,s.paytype from sioo_sms_international.sms_user s
+        <include refid="userlist_Where"></include>
+         order by s.time desc
+        <if test="currentPageIndex != null">
+            limit #{currentPageIndex,javaType=Integer},#{pageSize,javaType=Integer}
+        </if>
+    </select>
+
+    <select id="findOne" parameterType="java.lang.Integer" resultMap="smsUser">
+        select s.customer_id,s.id,s.dpwd,s.pwd,s.company,s.phone,s.tel,s.mail,s.linkman,s.address,s.sales,s.time,s.add_uid,s.stat,s.sms,s.priority,s.qq,s.remark,s.userkind,s.kefu,s.username,s.submittype,s.parentId,s.usertype,s.paytype from sioo_sms_international.sms_user s
+        where s.id=#{id,javaType=INTEGER}
+    </select>
+
+    <select id="countTotal" parameterType="com.sms.international.admin.model.SmsUser" resultType="java.lang.Integer">
+        SELECT count(0)
+        FROM sioo_sms_international.sms_user
+        <include refid="userlist_Where"></include>
+    </select>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from sms_user where id=#{id,javaType=INTEGER}
+    </delete>
+    
+    <update id="updatePassword" parameterType="com.sms.international.admin.model.SmsUser">
+        update sioo_sms_international.sms_user
+        <set>
+            <if test="pwd != null and pwd != ''">
+                pwd=#{pwd,jdbcType=VARCHAR},
+            </if>
+            <if test="dpwd != null and dpwd != ''">
+                dpwd=#{dpwd,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,javaType=INTEGER}
+    </update>
+
+    <update id="updateStatByParentId">
+        update sioo_sms_international.sms_user
+        <set>
+            <if test="stat != null">
+                stat=#{stat,jdbcType=INTEGER},
+            </if>
+        </set>
+        where parentId = #{parentId,javaType=INTEGER}
+    </update>
+
+    <update id="updateUserCharge">
+        update sioo_sms_international.sms_user
+        <set>
+            <if test="sms != null">
+                sms=sms+#{sms,javaType=DOUBLE},
+            </if>
+        </set>
+        where id = #{id,javaType=INTEGER}
+    </update>
+
+
+</mapper>

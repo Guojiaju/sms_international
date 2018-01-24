@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsBlackMobileMapper">
+    <resultMap id="BaseResultMap" type="com.sms.international.admin.model.SmsBlackMobile">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="mobile" property="mobile" jdbcType="BIGINT"/>
+        <result column="group_id" property="group_id" jdbcType="INTEGER"/>
+        <result column="addtime" property="addtime" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="mobileType" property="mobileType" jdbcType="INTEGER"/>
+        <result column="level" property="level" jdbcType="INTEGER"/>
+        <result column="relation" property="relation" jdbcType="VARCHAR"/>
+        <result column="country" property="country" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Select_List">
+        <where>
+            <if test="id != null">
+                AND id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="mobile != null">
+                AND mobile = #{mobile,jdbcType=BIGINT}
+            </if>
+            <if test="remark != null and remark != ''">
+                AND remark LIKE CONCAT(CONCAT('%', #{remark,jdbcType=VARCHAR}), '%')
+            </if>
+            <if test="mobileType != null">
+                AND mobileType = #{mobileType,jdbcType=INTEGER}
+            </if>
+            <if test="country != null and country != ''">
+                AND country = #{country,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findByT" resultMap="BaseResultMap" parameterType="com.sms.international.admin.model.SmsBlackMobile">
+        select
+        id ,mobile , group_id , addtime,remark ,mobileType ,level , relation ,country
+        from sioo_sms_international.sms_black_mobile
+        <include refid="Base_Select_List"/>
+        ORDER BY addtime desc
+        <if test="currentPageIndex != null">
+            limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <select id="countTotal" resultType="java.lang.Integer" parameterType="com.sms.international.admin.model.SmsBlackMobile">
+        select count(0) from sioo_sms_international.sms_black_mobile
+        <include refid="Base_Select_List"/>
+    </select>
+
+    <select id="findOne" resultType="com.sms.international.admin.model.SmsBlackMobile" parameterType="java.lang.Integer">
+        select id ,mobile , group_id , addtime,remark ,mobileType ,level , relation ,country
+        from sioo_sms_international.sms_black_mobile
+        where id = #{id}
+    </select>
+
+    <insert id="save" parameterType="com.sms.international.admin.model.SmsBlackMobile">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT @@IDENTITY
+        </selectKey>
+        insert into sioo_sms_international.sms_black_mobile
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="mobile != null">
+                mobile,
+            </if>
+            <if test="group_id != null">
+                group_id,
+            </if>
+            <if test="addtime != null and addtime !=''">
+                addtime,
+            </if>
+            <if test="remark != null and remark != '' ">
+                remark,
+            </if>
+            <if test="mobileType != null">
+                mobileType,
+            </if>
+            <if test="level != null">
+                level,
+            </if>
+            <if test="relation != null and relation != ''">
+                relation,
+            </if>
+            <if test="country != null and country != ''">
+                country
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="mobile != null">
+                #{mobile,jdbcType=BIGINT},
+            </if>
+            <if test="group_id != null">
+                #{group_id,jdbcType=INTEGER},
+            </if>
+            <if test="addtime != null and addtime !=''">
+                #{addtime,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark != '' ">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="mobileType != null">
+                #{mobileType,jdbcType=INTEGER},
+            </if>
+            <if test="level != null">
+                #{level,jdbcType=INTEGER},
+            </if>
+            <if test="relation != null and relation != ''">
+                #{relation,jdbcType=VARCHAR},
+            </if>
+            <if test="country != null and country != ''">
+                #{country,jdbcType=VARCHAR}
+            </if>
+        </trim>
+    </insert>
+    <update id="update" parameterType="com.sms.international.admin.model.SmsBlackMobile">
+        update sioo_sms_international.sms_black_mobile
+        <set>
+            <if test="mobile != null">
+                mobile =#{mobile,jdbcType=BIGINT},
+            </if>
+            <if test="group_id != null">
+                group_id =#{group_id,jdbcType=INTEGER},
+            </if>
+            <if test="addtime != null and addtime !=''">
+                addtime =#{addtime,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark != '' ">
+                remark= #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="mobileType != null">
+                mobileType =#{mobileType,jdbcType=INTEGER},
+            </if>
+            <if test="level != null">
+                level =#{level,jdbcType=INTEGER},
+            </if>
+            <if test="relation != null and relation != ''">
+                relation =#{relation,jdbcType=VARCHAR},
+            </if>
+            <if test="country != null and country != ''">
+                country =#{country,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+	<delete id="deleteById">
+		delete from sioo_sms_international.sms_black_mobile where id = #{id,jdbcType=INTEGER}
+	</delete>
+
+    <insert id="batchSave" parameterType="java.util.List">
+        <selectKey keyColumn="id" resultType="java.lang.Integer" order="AFTER">
+            select @@IDENTITY
+        </selectKey>
+        insert into sioo_sms_international.sms_black_mobile(mobile,group_id,addtime,remark,mobileType,level,relation,country)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+               #{item.mobile},
+               #{item.group_id},
+               #{item.addtime},
+               #{item.remark},
+               #{item.mobileType},
+               #{item.level},
+               #{item.relation},
+               #{item.country}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getExistMobiles" resultType="java.lang.Long">
+        select DISTINCT mobile from sioo_sms_international.sms_black_mobile where group_id =#{group_id,javaType=INTEGER}
+        and mobile in (
+        <foreach collection="list" item="item" index="index" separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
+</mapper>

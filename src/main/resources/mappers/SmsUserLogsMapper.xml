@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sms.international.admin.mapper.SmsUserLogsMapper">
+	<select id="countTotal" parameterType="com.sms.international.admin.model.SmsAdminLogs" resultType="java.lang.Integer">
+    select count(1) from sms_user_logs
+    <where>
+        <if test="log!=null and log!=''">
+            <bind name="logLike" value="'%'+log+'%'"/>
+            and log like #{logLike}
+        </if>
+    </where>
+  	</select>
+  	
+  	<select id="findByT" parameterType="com.sms.international.admin.model.SmsAdminLogs" resultType="com.sms.international.admin.model.SmsAdminLogs">
+    select 
+    	id, uid as user, time, ip, log
+    from sms_user_logs
+    <where>
+        <if test="log!=null and log!=''">
+            <bind name="logLike" value="'%'+log+'%'"/>
+            and log like #{logLike}
+        </if>
+    </where>
+    order by id desc
+    <if test="currentPageIndex != null">
+    limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+    </if>
+  </select>
+</mapper>

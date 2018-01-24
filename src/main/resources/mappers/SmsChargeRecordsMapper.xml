@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsChargeRecordsMapper">
+
+    <select id="findByT" resultType="com.sms.international.admin.model.SmsChargeRecords" parameterType="com.sms.international.admin.model.SmsChargeRecords">
+        select
+        r.id ,r.uid ,r.amount,r.chargeType,r.stat,r.gift,r.remark,r.add_uid,r.create_time,r.operate_type,
+        r.info,u.company
+        from sioo_sms_international.sms_charge_records r
+        left JOIN sioo_sms_international.sms_user u on r.uid = u.id
+        <where>
+            <if test="uid != null">
+                r.uid =#{uid,jdbcType=INTEGER}
+            </if>
+            <if test="stat != null">
+                r.stat =#{stat,jdbcType=INTEGER}
+            </if>
+            <if test="company != null and company != ''">
+                u.company =#{company,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by r.create_time desc
+        <if test="currentPageIndex != null">
+            limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <select id="countTotal"  resultType="java.lang.Integer" parameterType="com.sms.international.admin.model.SmsChargeRecords">
+        select count(0) from sioo_sms_international.sms_charge_records r
+        left JOIN sioo_sms_international.sms_user u on r.uid = u.id
+        <where>
+            <if test="uid != null">
+                r.uid =#{uid,jdbcType=INTEGER}
+            </if>
+            <if test="stat != null">
+                r.stat =#{stat,jdbcType=INTEGER}
+            </if>
+            <if test="company != null and company != ''">
+                u.company =#{company,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.sms.international.admin.model.SmsChargeRecords">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+            SELECT @@IDENTITY
+        </selectKey>
+        insert into sioo_sms_international.sms_charge_records
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="uid !=null and uid > 0">
+                uid,
+            </if>
+            <if test="amount !=null">
+                amount,
+            </if>
+            <if test="chargeType !=null">
+                chargeType,
+            </if>
+            <if test="stat !=null">
+                stat,
+            </if>
+            <if test="gift !=null and gift != '' ">
+                gift,
+            </if>
+            <if test="remark !=null and remark != '' ">
+                remark,
+            </if>
+            <if test="add_uid !=null and add_uid != '' ">
+                add_uid,
+            </if>
+            <if test="create_time !=null and create_time != '' ">
+                create_time,
+            </if>
+            <if test="operate_type !=null">
+                operate_type,
+            </if>
+            <if test="info !=null and info != '' ">
+                info,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="uid !=null and uid > 0">
+                #{uid,jdbcType=INTEGER},
+            </if>
+            <if test="amount !=null">
+                #{amount,jdbcType=DECIMAL},
+            </if>
+            <if test="chargeType !=null">
+                #{chargeType,jdbcType=INTEGER},
+            </if>
+            <if test="stat !=null">
+                #{stat,jdbcType=INTEGER},
+            </if>
+            <if test="gift !=null and gift != '' ">
+                #{gift,jdbcType=DECIMAL},
+            </if>
+            <if test="remark !=null and remark != '' ">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="add_uid !=null and add_uid != '' ">
+                #{add_uid,jdbcType=VARCHAR},
+            </if>
+            <if test="create_time !=null and create_time != '' ">
+                #{create_time,jdbcType=VARCHAR},
+            </if>
+            <if test="operate_type !=null">
+                #{operate_type,jdbcType=INTEGER},
+            </if>
+            <if test="info !=null and info != '' ">
+                #{info,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updatePayStat" parameterType="com.sms.international.admin.model.SmsChargeRecords">
+        update sioo_sms_international.sms_charge_records
+        set
+            stat =#{stat,jdbcType=INTEGER}
+        <if test="info != null and info != ''">
+            , info =#{info,jdbcType=VARCHAR}
+        </if>
+        where id =#{id,jdbcType=INTEGER}
+    </update>
+</mapper>

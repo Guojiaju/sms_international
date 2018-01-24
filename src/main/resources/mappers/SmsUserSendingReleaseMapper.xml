@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sms.international.admin.mapper.SmsUserSendingReleaseMapper">
+
+    <resultMap id="sendingReleaseCountMap" type="com.sms.international.admin.model.SmsUserSendingRelease">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="mtype" property="mtype" jdbcType="INTEGER"/>
+        <result column="senddate" property="senddate" jdbcType="BIGINT"/>
+        <result column="uid" property="uid" jdbcType="INTEGER"/>
+        <result column="mobile" property="mobile" jdbcType="BIGINT"/>
+        <result column="channel" property="channel" jdbcType="INTEGER"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="content_num" property="contentNum" jdbcType="INTEGER"/>
+        <result column="grade" property="grade" jdbcType="INTEGER"/>
+        <result column="expid" property="expid" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="hisids" property="hisids" jdbcType="INTEGER"/>
+        <result column="mdstr" property="mdstr" jdbcType="VARCHAR"/>
+        <result column="handstat" property="handstat" jdbcType="INTEGER"/>
+        <result column="location" property="location" jdbcType="VARCHAR"/>
+        <result column="screenType" property="screenType" jdbcType="INTEGER" />
+    </resultMap>
+ <resultMap id="voMap" type="com.sms.international.admin.model.SendingVo">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="mtype" property="mtype" jdbcType="INTEGER"/>
+        <result column="senddate" property="senddate" jdbcType="BIGINT"/>
+        <result column="uid" property="uid" jdbcType="INTEGER"/>
+        <result column="mobile" property="mobile" jdbcType="BIGINT"/>
+        <result column="channel" property="channel" jdbcType="INTEGER"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="content_num" property="contentNum" jdbcType="INTEGER"/>
+        <result column="grade" property="grade" jdbcType="INTEGER"/>
+        <result column="expid" property="expid" jdbcType="VARCHAR"/>
+     <!--    <result column="remark" property="remark" jdbcType="VARCHAR"/> -->
+        <result column="hisids" property="hisids" jdbcType="INTEGER"/>
+       <result column="mdstr" property="mtStat" jdbcType="VARCHAR"/>
+       <!--  <result column="handstat" property="handStat" jdbcType="INTEGER"/> -->
+        <result column="location" property="location" jdbcType="VARCHAR"/>
+        <result column="screenType" property="screenType" jdbcType="INTEGER" />
+    </resultMap>
+
+
+    <sql id="sendingCount_where">
+        <where>
+            handstat=0
+            <if test="uid!=null and uid>0">
+                and uid=#{uid,jdbcType=INTEGER}
+            </if>
+            <if test="content!=null and content!=''">
+                and content like concat(concat('%',#{content,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="mtype!=null and mtype>0">
+                and mtype=#{mtype,jdbcType=INTEGER}
+            </if>
+            <if test="channel!=null and channel>0">
+                and channel=#{channel,jdbcType=INTEGER}
+            </if>
+            <if test="mdstr!=null and mdstr!=''">
+                and mdstr=#{mdstr,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </sql>
+
+    <sql id="sendingVo_where">
+        <where>
+             handstat=0
+            <if test="mdStrs!=null">
+                and mdstr  in
+                <foreach item="item" index="index" collection="mdStrs" open="(" separator="," close=")">
+                  #{item}
+                </foreach>
+            </if>
+            <if test="mdstr!=null and mdstr!=''">
+               and  mdstr  =#{mdstr,jdbcType=VARCHAR}
+            </if>
+            <if test="uid!=null and uid>0">
+               and  uid=#{uid,jdbcType=INTEGER}
+            </if>
+            <if test="content!=null and content!=''">
+                and content like concat(concat('%',#{content,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="mtype!=null and mtype>0">
+                and mtype=#{mtype,jdbcType=INTEGER}
+            </if>
+            <if test="channel!=null and channel>0">
+                and channel=#{channel,jdbcType=INTEGER}
+            </if>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id,mtype,senddate,uid,mobile,channel,content,content_num,stat,pid,grade,expid,remark,hisids,mdstr,handstat,screenType
+    </sql>
+    <sql id="Count_Column_List">
+        usr.id,usr.mtype,usr.senddate,usr.uid,usr.content,usr.channel,COUNT(0) count,SUM(usr.content_num) num,usr.remark,usr.mdstr,usr.screenType
+    </sql>
+    <sql id="sendingRelease_where">
+        <if test="mtype!=null and mtype>0" >
+            and mtype=#{mtype,jdbcType=SMALLINT}
+        </if>
+        <if test="uid != null">
+            and uid=#{uid,jdbcType=INTEGER}
+        </if>
+        <if test="mobile != null">
+            and mobile=#{mobile,jdbcType=BIGINT}
+        </if>
+        <if test="channel != null and channel>0">
+            and channel=#{channel,jdbcType=INTEGER}
+        </if>
+        <if test="content !=null and content!=''">
+            and content like CONCAT(CONCAT('%',#{content,jdbcType=VARCHAR}),'%')
+        </if>
+    </sql>
+
+    <select id="findByT" parameterType="com.sms.international.admin.model.SmsUserSendingRelease"  resultMap="sendingReleaseCountMap">
+	    SELECT <include refid="Count_Column_List"/> ,usr.level FROM sioo_sms_international.sms_user_sending_release usr WHERE
+		usr.mdstr in(select mdstr from(select mdstr from sioo_sms_international.sms_user_sending_release <include refid="sendingCount_where"/> GROUP BY mdstr
+		  ORDER BY level DESC
+		<if test="currentPageIndex != null">
+            limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>)as cd) GROUP BY usr.mdstr ORDER BY usr.level DESC;
+    </select>
+    <select id="findT" parameterType="com.sms.international.admin.model.SmsUserSendingRelease"  resultMap="voMap">
+	    SELECT <include refid="Base_Column_List"/> FROM sioo_sms_international.sms_user_sending_release
+		<include refid="sendingVo_where"/>
+		  ORDER BY id DESC
+		<!-- <if test="currentPageIndex != null">
+            limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if> -->
+    </select>
+
+    <select id="findTToCount" parameterType="com.sms.international.admin.model.SmsUserSendingRelease"  resultMap="voMap">
+	    SELECT <include refid="Base_Column_List"/> FROM sioo_sms_international.sms_user_sending_release
+		<include refid="sendingVo_where"/>
+		  ORDER BY id DESC
+            limit 0,1000
+    </select>
+
+
+    <select id="findPassId" parameterType="java.util.List"  resultType="java.lang.Integer">
+	    SELECT id FROM sioo_sms_international.sms_user_sending_release where mdstr in
+         <foreach collection="mdStrs" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+    </select>
+
+    <update id="selUpdate" parameterType="map">
+        update sioo_sms_international.sms_user_sending_release
+        <set>
+            <if test="handstat != null">
+                handstat=#{handstat,jdbcType=INTEGER},
+            </if>
+            <if test="channel != null">
+                channel=#{channel,jdbcType=INTEGER},
+            </if>
+        </set>
+          where mdstr in
+         <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+    </update>
+
+    <update id="selUpdateOne" parameterType="map">
+        update sioo_sms_international.sms_user_sending_release
+        <set>
+            <if test="handstat != null">
+                handstat=#{handstat,jdbcType=INTEGER},
+            </if>
+        </set>
+          where mdstr = #{mdstr,jdbcType=VARCHAR}
+    </update>
+
+    <update id="searchUpdate" parameterType="com.sms.international.admin.model.SmsUserSendingRelease">
+        update sioo_sms_international.sms_user_sending_release
+        <set>
+            <if test="handstat != null">
+                handstat=#{remark,jdbcType=INTEGER},
+            </if>
+        </set>
+          <include refid="sendingCount_where"/>
+    </update>
+
+    <select id="searchPassId" parameterType="com.sms.international.admin.model.SmsUserSendingRelease"  resultType="java.lang.Integer">
+	    SELECT id FROM sioo_sms_international.sms_user_sending_release <include refid="sendingCount_where"/>
+    </select>
+
+    <select id="lookDetail" parameterType="com.sms.international.admin.model.SmsUserSendingRelease"  resultMap="sendingReleaseCountMap">
+	    SELECT id,mobile,location from sioo_sms_international.sms_user_sending_release <include refid="sendingCount_where"/>
+    <if test="currentPageIndex != null">
+            limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <select id="countTotal" parameterType="com.sms.international.admin.model.SmsUserSendingRelease" resultType="java.lang.Integer">
+    select count(t.mdstr) from
+	(select mdstr,count(0) counts from sioo_sms_international.sms_user_sending_release <include refid="sendingCount_where"/> group by mdstr) t
+    </select>
+
+    <select id="countLookDetailTotal" parameterType="com.sms.international.admin.model.SmsUserSendingRelease" resultType="java.lang.Integer">
+        select COUNT(0) from sioo_sms_international.sms_user_sending_release <include refid="sendingCount_where"/>
+    </select>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from sioo_sms_international.sms_user_sending_release where id=#{id,jdbcType=INTEGER}
+    </delete>
+   <delete id="deleteByMd5str" parameterType="java.lang.String">
+        delete from sioo_sms_international.sms_user_sending_release where mdstr in(#{mdstr,jdbcType=VARCHAR})
+    </delete>
+    <insert id="save" parameterType="com.sms.international.admin.model.SmsUserSendingRelease">
+        <selectKey keyColumn="id" resultType="java.lang.Integer" order="AFTER">
+            select @@IDENTITY
+        </selectKey>
+        insert into sioo_sms_international.sms_user_sending_release
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stype!=null and stype!=''">
+                stype,
+            </if>
+            <if test="mtype!=null and mtype!=''">
+                mtype,
+            </if>
+
+            <if test="senddate!=null and senddate!=''">
+                senddate,
+            </if>
+
+            <if test="sendtime!=null and sendtime!=''">
+                sendtime,
+            </if>
+
+            <if test="uid!=null">
+                uid,
+            </if>
+            <if test="mobile!=null and mobile!=''">
+                mobile,
+            </if>
+            <if test="channel!=null and channel!=''">
+                channel,
+            </if>
+            <if test="content!=null and content!=''">
+                content,
+            </if>
+            <if test="contentNum!=null and contentNum!=''">
+                contentNum,
+            </if>
+            <if test="mobileNum!=null and mobileNum!=''">
+                mobileNum,
+            </if>
+            <if test="stat!=null and stat!=''">
+                stat,
+            </if>
+            <if test="mtstat!=null and mtstat!=''">
+                mtstat,
+            </if>
+            <if test="pid!=null and pid!=''">
+                pid,
+            </if>
+            <if test="grade!=null and grade!=''">
+                grade,
+            </if>
+            <if test="statTranslate!=null and statTranslate!=''">
+                statTranslate,
+            </if>
+            <if test="channelTranslate!=null and channelTranslate!=''">
+                channelTranslate,
+            </if>
+            <if test="rptstat!=null and rptstat!=''">
+                rptstat,
+            </if>
+            <if test="rpttime!=null and rpttime!=''">
+                rpttime,
+            </if>
+            <if test="screenType !=null">
+                screenType
+            </if>
+        </trim>
+
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="stype!=null and stype!=''">
+            #{stype,jdbcType=VARCHAR},
+            </if>
+            <if test="mtype!=null and mtype!=''">
+               #{mtype,jdbcType=VARCHAR},
+            </if>
+
+            <if test="senddate!=null and senddate!=''">
+              #{senddate,jdbcType=TIMESTAMP},
+            </if>
+
+            <if test="sendtime!=null and sendtime!=''">
+               #{sendtime,jdbcType=TIMESTAMP},
+            </if>
+
+            <if test="uid!=null">
+              #{uid,jdbcType=INTEGER},
+            </if>
+            <if test="mobile!=null and mobile!=''">
+              #{mobile,jdbcType=VARCHAR},
+            </if>
+            <if test="channel!=null and channel!=''">
+              #{channel,jdbcType=INTEGER},
+            </if>
+            <if test="content!=null and content!=''">
+              #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="contentNum!=null and contentNum!=''">
+              #{contentNum,jdbcType=INTEGER},
+            </if>
+            <if test="mobileNum!=null and mobileNum!=''">
+              #{mobileNum,jdbcType=INTEGER},
+            </if>
+            <if test="stat!=null and stat!=''">
+             #{stat,jdbcType=INTEGER},
+            </if>
+            <if test="mtstat!=null and mtstat!=''">
+             #{mtstat,jdbcType=VARCHAR},
+            </if>
+            <if test="pid!=null and pid!=''">
+             #{pid,jdbcType=INTEGER},
+            </if>
+            <if test="grade!=null and grade!=''">
+             #{grade,jdbcType=VARCHAR},
+            </if>
+            <if test="statTranslate!=null and statTranslate!=''">
+             #{statTranslate,jdbcType=VARCHAR},
+            </if>
+            <if test="channelTranslate!=null and channelTranslate!=''">
+             #{channelTranslate,jdbcType=VARCHAR},
+            </if>
+            <if test="rptstat!=null and rptstat!=''">
+             #{rptstat,jdbcType=VARCHAR},
+            </if>
+            <if test="rpttime!=null and rpttime!=''">
+             #{rpttime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="screenType !=null">
+                #{screenType,jdbcType=INTEGER}
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.sms.international.admin.model.SmsUserSendingRelease">
+          update sioo_sms_international.sms_user_sending_release
+          <set>
+              <if test="stype!=null and stype!=''">
+                  stype=#{stype,jdbcType=VARCHAR},
+              </if>
+              <if test="mtype!=null and mtype!=''">
+                   mtype=#{mtype,jdbcType=VARCHAR},
+              </if>
+
+              <if test="senddate!=null and senddate!=''">
+                   senddate = #{senddate,jdbcType=TIMESTAMP},
+              </if>
+
+              <if test="sendtime!=null and sendtime!=''">
+                   sendtime=#{sendtime,jdbcType=TIMESTAMP},
+              </if>
+
+              <if test="uid!=null">
+                   uid=#{uid,jdbcType=INTEGER},
+              </if>
+              <if test="mobile!=null and mobile!=''">
+                   mobile=#{mobile,jdbcType=VARCHAR},
+              </if>
+              <if test="channel!=null and channel!=''">
+                   channel=#{channel,jdbcType=INTEGER},
+              </if>
+              <if test="content!=null and content!=''">
+                   content=#{content,jdbcType=VARCHAR},
+              </if>
+              <if test="contentNum!=null and contentNum!=''">
+                   contentNum=#{contentNum,jdbcType=INTEGER},
+              </if>
+              <if test="mobileNum!=null and mobileNum!=''">
+                   mobileNum=#{mobileNum,jdbcType=INTEGER},
+              </if>
+              <if test="stat!=null and stat!=''">
+                   stat=#{stat,jdbcType=INTEGER},
+              </if>
+              <if test="mtstat!=null and mtstat!=''">
+                   mtstat=#{mtstat,jdbcType=VARCHAR},
+              </if>
+              <if test="pid!=null and pid!=''">
+                   pid=#{pid,jdbcType=INTEGER},
+              </if>
+              <if test="grade!=null and grade!=''">
+                   grade=#{grade,jdbcType=VARCHAR},
+              </if>
+              <if test="statTranslate!=null and statTranslate!=''">
+                   statTranslate=#{statTranslate,jdbcType=VARCHAR},
+              </if>
+              <if test="channelTranslate!=null and channelTranslate!=''">
+                   channelTranslate=#{channelTranslate,jdbcType=VARCHAR},
+              </if>
+              <if test="rptstat!=null and rptstat!=''">
+                   rptstat=#{rptstat,jdbcType=VARCHAR},
+              </if>
+              <if test="rpttime!=null and rpttime!=''">
+                   rpttime=#{rpttime,jdbcType=TIMESTAMP},
+              </if>
+              <if test="screenType !=null">
+                  screenType=#{screenType,jdbcType=INTEGER}
+              </if>
+          </set>
+          where id=#{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateReleaseMessage" parameterType="java.util.HashMap">
+        update sioo_sms_international.sms_user_sending_release
+        <set>
+            <if test="handstat!=null">
+                handstat=#{handstat,jdbcType=INTEGER},
+            </if>
+            <if test="toChannel!=null">
+                channel=#{toChannel,jdbcType=INTEGER}
+            </if>
+        </set>
+      where mdstr in
+      <foreach item="item" index="index" collection="ids" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateReleaseMessageToIds" parameterType="java.util.HashMap">
+        update sioo_sms_international.sms_user_sending_release set handstat=1
+        <if test="toChannel !=null">
+        	,channel=#{toChannel}
+        </if>
+      where id in
+      <foreach item="item" index="index" collection="list" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateReleaseContent" parameterType="java.util.HashMap">
+        update sioo_sms_international.sms_user_sending_release
+        <set>
+            <if test="content!=null">
+                content=#{content,jdbcType=VARCHAR}
+            </if>
+        </set>
+      where mdstr=#{mdstr}
+    </update>
+
+  <update id="updateReleaseMessageBysearch" parameterType="java.util.HashMap">
+        update sioo_sms_international.sms_user_sending_release
+        <set>
+            <if test="handstat!=null">
+                handstat=#{handstat,jdbcType=INTEGER},
+            </if>
+            <if test="toChannel!=null">
+                channel=#{toChannel,jdbcType=INTEGER}
+            </if>
+        </set>
+      <where>
+            handstat=0
+            <if test="uid!=null and uid>0">
+               and  uid=#{uid,jdbcType=INTEGER}
+            </if>
+            <if test="content!=null and content!=''">
+                and content like concat(concat('%',#{content,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="mtype!=null and mtype>0">
+                and mtype=#{mtype,jdbcType=INTEGER}
+            </if>
+            <if test="channel!=null and channel>0">
+                and channel=#{channel,jdbcType=INTEGER}
+            </if>
+        </where>
+
+    </update>
+
+    <select id="findSendingReleaseByIds" parameterType="java.util.HashMap" resultMap="sendingReleaseCountMap">
+        select id,channel,mdstr from sioo_sms_international.sms_user_sending_release where id in
+        <foreach item="item" index="index" collection="ids" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+        group by mdstr
+    </select>
+</mapper>

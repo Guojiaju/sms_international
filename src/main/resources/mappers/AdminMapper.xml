@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.AdminMapper">
+    <resultMap type="com.sms.international.admin.model.Admin" id="baseResultMap">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="realname" property="realname" jdbcType="VARCHAR"/>
+        <result column="roleName" property="roleName" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="createDate" property="createDate" jdbcType="TIMESTAMP"/>
+        <result column="logtime" property="logtime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="user_Where">
+        <where>
+            <if test="id != null">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="username != null and username != ''">
+                and username = trim(#{username,jdbcType=VARCHAR})
+            </if>
+            <if test="password != null and password != ''">
+                and password = trim(#{password,jdbcType=VARCHAR})
+            </if>
+            <if test="phone != null and phone != ''">
+                and phone = trim(#{phone,jdbcType=VARCHAR})
+            </if>
+            <if test="createDate != null and createDate != ''">
+                and createDate = #{createDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="logtime != null and logtime != ''">
+                and logtime = #{logtime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="status != null">
+                and status = #{status,jdbcType=INTEGER}
+            </if>
+            <if test="realname != null and realname != ''">
+            	and realname = trim(#{realname,jdbcType=VARCHAR})
+            </if>
+        </where>
+    </sql>
+
+    <sql id="userlist_Where">
+        <where>
+            <if test="id != null">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="username != null and username != ''">
+                and a.username = trim(#{username,jdbcType=VARCHAR})
+            </if>
+            <if test="phone != null and phone != ''">
+                and a.phone = trim(#{phone,jdbcType=VARCHAR})
+            </if>
+            <if test="createDate != null and createDate != ''">
+                and a.createDate = #{createDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="logtime != null and logtime != ''">
+                and a.logtime = #{logtime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="status != null">
+                and a.status = #{status,jdbcType=INTEGER}
+            </if>
+        </where>
+    </sql>
+
+    <insert id="addUser" parameterType="com.sms.international.admin.model.Admin">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT @@IDENTITY
+        </selectKey>
+        insert into sioo_sms_international.sms_admin
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="username != null and username != ''">
+                username,
+            </if>
+             <if test="realname != null and realname != ''">
+                realname,
+            </if>
+            <if test="password != null and password != ''">
+                password,
+            </if>
+            <if test="phone != null and phone != ''">
+                phone,
+            </if>
+            <if test="createDate != null and createDate != ''">
+                createDate,
+            </if>
+            <if test="logtime != null and logtime != ''">
+                logtime,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="username != null and  username != ''">
+                #{username,jdbcType=VARCHAR},
+            </if>
+             <if test="realname != null and  realname != ''">
+                #{realname,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null and password != ''">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null and phone != ''">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="createDate != null and createDate != ''">
+                #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="logtime != null and logtime != ''">
+                #{logtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateUser" parameterType="com.sms.international.admin.model.Admin">
+        update sioo_sms_international.sms_admin
+        <set>
+            <if test="password != null and password != ''">
+                password = trim(#{password,jdbcType=VARCHAR}),
+            </if>
+            <if test="realname != null and realname != ''">
+                realname = trim(#{realname,jdbcType=VARCHAR}),
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = trim(#{phone,jdbcType=VARCHAR}),
+            </if>
+            <if test="createDate != null and createDate != ''">
+                createDate = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="logtime != null and logtime != ''">
+                logtime = #{logtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER} or username=#{username,jdbcType=INTEGER}
+    </update>
+
+    <update id="updatePass" parameterType="map">
+        update sioo_sms_international.sms_admin
+        <set>
+            <if test="password != null and password != ''">
+                password = trim(#{password,jdbcType=VARCHAR}),
+            </if>
+        </set>
+        where id = #{uid,jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteUser" parameterType="java.lang.Integer">
+        DELETE FROM sioo_sms_international.sms_admin
+        WHERE id = #{uid,jdbcType=INTEGER}
+    </delete>
+
+    <select id="findByT" parameterType="com.sms.international.admin.model.Admin" resultMap="baseResultMap">
+        select id,username,realname,logtime,password,phone,status,createDate from sioo_sms_international.sms_admin
+        <include refid="user_Where"></include>
+        order by id desc
+        <if test="currentPageIndex != null">
+            limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <sql id="colum_list">
+        a.id, a.username, ( SELECT GROUP_CONCAT(r.roleName) roleName FROM admin_role ar LEFT JOIN role r ON ar.rid=r.id WHERE ar.uid=a.id ) AS roleName, a.phone, a.createDate, a.`status`,
+    </sql>
+
+    <select id="findUserList" parameterType="com.sms.international.admin.model.Admin" resultMap="baseResultMap">
+
+        <!-- SELECT a.id,a.phone,a.username,a.createDate,a.realname,a.`status`,(SELECT GROUP_CONCAT(r.roleName) FROM sioo_sms_international.admin_role ar
+        LEFT JOIN role r ON ar.rid=r.id WHERE ar.uid=a.id) roleName FROM sioo_sms_international.sms_admin a -->
+        SELECT
+			a.id,
+			a.phone,
+			a.username,
+			a.createDate,
+			a.realname,
+			a.`status`,
+			rn.roleName roleName
+		FROM
+			sioo_sms_international.sms_admin a 
+			left join 
+				(
+					SELECT
+						uid,
+						GROUP_CONCAT(r.roleName) roleName
+					FROM
+						sioo_sms_international.admin_role ar LEFT JOIN role r ON ar.rid = r.id
+					where 1=1
+					<if test="rids != null">
+						and ar.rid in 
+						<foreach collection="rids" item="rid" open="(" close=")" separator=",">
+							#{rid}
+						</foreach>
+					</if>
+					group by ar.uid
+				) rn on rn.uid = a.id
+        <include refid="userlist_Where"></include>
+        order by id desc
+        <if test="currentPageIndex != null">
+            limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <select id="findByUsername" parameterType="java.lang.String" resultType="com.sms.international.admin.model.Admin">
+        SELECT
+            id,
+            username,
+            realname,
+            password,
+            phone,
+            status,
+            createDate
+        FROM sioo_sms_international.sms_admin
+        WHERE username = #{username}
+    </select>
+
+    <select id="countTotal" parameterType="com.sms.international.admin.model.Admin" resultType="java.lang.Integer">
+        select count(0) from sioo_sms_international.sms_admin a
+        <if test="rids != null">
+	        left join 
+				(
+					SELECT
+						uid,
+						GROUP_CONCAT(r.roleName) roleName
+					FROM
+						sioo_sms_international.admin_role ar LEFT JOIN role r ON ar.rid = r.id
+					where 1=1
+					and ar.rid in 
+					<foreach collection="rids" item="rid" open="(" close=")" separator=",">
+						#{rid}
+					</foreach>
+					group by ar.uid
+				) rn on rn.uid = a.id
+		</if>
+        <include refid="user_Where"/>
+    </select>
+
+    <delete id="delRoles" parameterType="java.lang.Integer">
+        DELETE FROM sioo_sms_international.admin_role
+        WHERE uid = #{id}
+    </delete>
+
+    <insert id="insUserRole" parameterType="map">
+        INSERT INTO sioo_sms_international.admin_role VALUES (#{uid}, #{rid})
+    </insert>
+
+    <select id="lognameIsExist" resultType="java.lang.Integer" parameterType="java.lang.String">
+        SELECT count(0)
+        FROM sioo_sms_international.sms_admin
+        WHERE LOWER(username) = LOWER(#{username,jdbcType=VARCHAR})
+    </select>
+
+    <select id="phoneIsExist" resultType="java.lang.Integer" parameterType="java.lang.String">
+        SELECT count(0)
+        FROM sioo_sms_international.sms_admin
+        WHERE LOWER(phone) = LOWER(#{phone,jdbcType=VARCHAR})
+    </select>
+
+    <select id="findOne" parameterType="java.lang.Integer" resultType="com.sms.international.admin.mapper.AdminMapper">
+        select * from sioo_sms_international.sms_admin where uid=#{id}
+    </select>
+    
+    <select id="findByRoleId" parameterType="java.lang.Integer" resultMap="baseResultMap">
+		 SELECT
+            id,
+            username,
+            realname,
+            phone
+        FROM
+        	sms_admin 
+        WHERE 
+        	id IN (SELECT uid FROM admin_role WHERE rid=#{roleId,jdbcType=INTEGER})
+    </select>
+</mapper>

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsCustomerMapper">
+    <resultMap id="smsCustomer" type="com.sms.international.admin.model.SmsCustomer">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="cname" jdbcType="VARCHAR" property="cname"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="link_man" jdbcType="VARCHAR" property="link_man"/>
+        <result column="tel" jdbcType="VARCHAR" property="tel"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="qq" jdbcType="VARCHAR" property="qq"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="sales" jdbcType="VARCHAR" property="sales"/>
+        <result column="sales_id" jdbcType="INTEGER" property="sales_id"/>
+        <result column="create_date" jdbcType="INTEGER" property="create_date"/>
+        <result column="stat" property="stat" jdbcType="INTEGER" />
+    </resultMap>
+
+    <insert id="save" parameterType="com.sms.international.admin.model.SmsCustomer">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+            SELECT @@IDENTITY
+        </selectKey>
+        insert into sioo_sms_international.sms_customer
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null and id > 0">
+                id,
+            </if>
+            <if test="cname !=null and cname != '' ">
+                cname,
+            </if>
+            <if test="address != null and address !=''">
+                address,
+            </if>
+            <if test="link_man != null and link_man !=''">
+                link_man,
+            </if>
+            <if test="tel != null and tel != ''">
+                tel,
+            </if>
+            <if test="phone != null and phone != ''">
+                phone,
+            </if>
+            <if test="qq != null and qq !=''">
+                qq,
+            </if>
+            <if test="email != null and email !=''">
+                email,
+            </if>
+            <if test="remark != null and remark !=''">
+                remark,
+            </if>
+            <if test="sales != null and sales !=''">
+                sales,
+            </if>
+            <if test="sales_id != null">
+                sales_id,
+            </if>
+            <if test="stat != null">
+                stat,
+            </if>
+            <if test="create_date != null and create_date !=''">
+                create_date,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null and id > 0">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="cname !=null and cname != '' ">
+                #{cname,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null and address !=''">
+                #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="link_man != null and link_man !=''">
+                #{link_man,jdbcType=VARCHAR},
+            </if>
+            <if test="tel != null and tel != ''">
+                #{tel,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null and phone != ''">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="qq != null and qq !=''">
+                #{qq,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null and email !=''">
+                #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark !=''">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="sales != null and sales !=''">
+                #{sales,jdbcType=VARCHAR},
+            </if>
+            <if test="sales_id != null">
+                #{sales_id,jdbcType=VARCHAR},
+            </if>
+            <if test="stat != null">
+                #{stat,jdbcType=INTEGER},
+            </if>
+            <if test="create_date != null and create_date !=''">
+                #{create_date,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.sms.international.admin.model.SmsCustomer">
+        update sioo_sms_international.sms_customer
+        <set>
+            <if test="cname != null and cname !=''">
+                cname =#{cname,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null and phone !=''">
+                phone =#{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="tel != null and tel !=''">
+                tel =#{tel,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null and address !=''">
+                address =#{address,jdbcType=VARCHAR},
+            </if>
+            <if test="link_man != null and link_man !=''">
+                link_man =#{link_man,jdbcType=VARCHAR},
+            </if>
+            <if test="qq != null and qq !=''">
+                qq =#{qq,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null and email !=''">
+                email =#{email,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark !=''">
+                remark =#{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="qq != null and qq !=''">
+                qq =#{qq,jdbcType=VARCHAR},
+            </if>
+            <if test="stat != null ">
+                stat =#{stat,jdbcType=INTEGER},
+            </if>
+            <if test="sales != null and sales != ''">
+                sales =#{sales,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <sql id="userlist_Where">
+        <where>
+            <if test="id!=null">
+                id=#{id,javaType=INTEGER}
+            </if>
+            <if test="cname !=null and cname!=''">
+                and cname like CONCAT(CONCAT('%',#{cname,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="address!=null and address!=''">
+                and address like CONCAT(CONCAT('%',#{address,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="sales!=null and sales!=''">
+                and sales like CONCAT(CONCAT('%',#{sales,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="qq!=null and qq!=''">
+                and qq like CONCAT(CONCAT('%',#{qq,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="phone!=null and phone!=''">
+                and phone like CONCAT(CONCAT('%',#{phone,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="tel!=null and tel!=''">
+                and tel like CONCAT(CONCAT('%',#{tel,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="stat !=null">
+                and stat =#{stat,jdbcType=INTEGER}
+            </if>
+            <if test="ids != null">
+                and id in
+                <foreach item="item" index="index" collection="ids" open="("
+                         separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </sql>
+    <select id="findByT" parameterType="com.sms.international.admin.model.SmsCustomer"
+            resultType="com.sms.international.admin.model.SmsCustomer">
+        select id,cname,address,link_man,tel,phone,qq,email,remark,sales,sales_id,create_date,stat from sioo_sms_international.sms_customer
+        <include refid="userlist_Where"></include>
+         order by create_date desc
+        <if test="currentPageIndex != null">
+            limit #{currentPageIndex,javaType=Integer},#{pageSize,javaType=Integer}
+        </if>
+    </select>
+
+    <select id="countTotal" parameterType="com.sms.international.admin.model.SmsCustomer"
+            resultType="java.lang.Integer">
+        select count(0) from sioo_sms_international.sms_customer
+        <include refid="userlist_Where"></include>
+    </select>
+
+    <select id="findOne" parameterType="java.lang.Integer" resultMap="smsCustomer">
+        select id,cname,address,link_man,tel,phone,qq,email,remark,sales,sales_id,create_date from sioo_sms_international.sms_customer
+        where id=#{id,javaType=INTEGER}
+    </select>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from sms_customer where id=#{id,javaType=INTEGER}
+    </delete>
+    
+</mapper>

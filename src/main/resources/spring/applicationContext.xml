@@ -1,0 +1,171 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	   xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:task="http://www.springframework.org/schema/task"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	http://www.springframework.org/schema/util
+	http://www.springframework.org/schema/util/spring-util-4.0.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+	http://www.springframework.org/schema/task 
+	http://www.springframework.org/schema/task/spring-task.xsd">
+
+
+	<!-- 使用spring自带的占位符替换功能 -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<!-- 允许JVM参数覆盖 -->
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+		<!-- 忽略没有找到的资源文件 -->
+		<property name="ignoreResourceNotFound" value="true"/>
+		<!-- 配置资源文件 -->
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+				<value>classpath:log4j.properties</value>
+				<value>classpath:config.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 获取properties中的值 -->
+	<bean id="configProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<value>classpath:config.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 配置扫描包 -->
+	<context:component-scan base-package="com.sms.international.admin"/>
+
+	<!-- 数据连sioo_business_annlyse接管理 -->
+	<bean id="transactionManager"
+		  class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	<!-- ibatis3.x 配置 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="configLocation" value="classpath:configuration.xml"/>
+	</bean>
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate"
+		  scope="prototype">
+		<constructor-arg index="0" ref="sqlSessionFactory"/>
+	</bean>
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.sms.international.admin.mapper"/>
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+	</bean>
+
+	<!-- 启用注解事务声明 -->
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+
+	<!-- 编程式事物 -->
+	<bean id="defaultTransactionDefinition"
+		  class="org.springframework.transaction.support.DefaultTransactionDefinition"></bean>
+
+	<bean destroy-method="close" init-method="init" class="com.alibaba.druid.pool.DruidDataSource" id="dataSource">
+		<property value="${url}" name="url"/>
+		<property value="${common.username}" name="username"/>
+		<property value="${common.password}" name="password"/>
+		<!-- 配置初始化大小、最小、最大 -->
+		<property value="1" name="initialSize"/>
+		<property value="1" name="minIdle"/>
+		<property value="500" name="maxActive"/>
+		<!-- 配置获取连接等待超时的时间 -->
+		<property value="60000" name="maxWait"/>
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property value="60000" name="timeBetweenEvictionRunsMillis"/>
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property value="300000" name="minEvictableIdleTimeMillis"/>
+		<property value="SELECT 'x'" name="validationQuery"/>
+		<property value="true" name="testWhileIdle"/>
+		<property value="false" name="testOnBorrow"/>
+		<property value="false" name="testOnReturn"/>
+		<property name="filters" value="stat"/>
+	</bean>
+
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<!-- shiro 权限控制 -->
+	<bean id="shiroSecurityFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<!-- shiro 的核心安全接口 -->
+		<property name="securityManager" ref="securityManager"/>
+		<!-- 要求登录时的链接 -->
+		<property name="loginUrl" value="/login"/>
+		<!-- 登陆成功后要跳转的连接 -->
+		<property name="successUrl" value="/home"/>
+		<!-- 权限不足，跳转路径 -->
+		<property name="unauthorizedUrl" value="/unauthorized.jsp"/>
+		<!-- shiro 连接约束配置 -->
+		<!-- URL控制规则 路径=规则 -->
+		<property name="filterChainDefinitions">
+			<value>
+				/testFrom = anon
+				/testTable = anon
+				/login = anon
+				/validatecode.jsp = anon
+				/css/** = anon
+				/js/** =anon
+				/static/** = anon
+				/images/** = anon
+				/admin/loginVerify = anon
+				/admin/doLogin = anon
+				/pic/upload=anon
+				/captcha = anon
+				/** = authc
+			</value>
+		</property>
+	</bean>
+
+	<!-- 安全管理器 -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<!-- 在安全管理器，应该注入 Realm 连接安全数据 -->
+		<property name="realm" ref="xcRealm"></property>
+		<!-- 注入缓存管理器 -->
+		<property name="cacheManager" ref="shirocacheManager"/>
+		<!-- 注入管理器 -->
+		<property name="sessionManager" ref="sessionManager"/>
+	</bean>
+
+	<!-- shiro 管理session的类 -->
+	<bean id="sessionDAO" class="org.apache.shiro.session.mgt.eis.MemorySessionDAO"/>
+
+	<!-- session管理类 -->
+	<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+		<property name="sessionDAO" ref="sessionDAO"/>
+		<!-- session过期时间 -->
+		<property name="globalSessionTimeout" value="7200000"/>
+		<property name="sessionIdCookie.name" value="sms_international_id"/>
+		<property name="sessionIdUrlRewritingEnabled" value="false"/>
+		<property name="sessionIdCookie.path" value="/"/>
+	</bean>
+
+	<!-- 在realm中指定使用缓存区名称 -->
+	<bean id="xcRealm" class="com.sms.international.admin.realm.AdminRealm">
+		<property name="authorizationCacheName" value="sms_international_cache"/>
+	</bean>
+
+	<!-- ehcache 缓存管理器 -->
+	<bean id="ehcacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="classpath:ehcache.xml"/>
+		<property name="shared" value="true"/>
+	</bean>
+
+	<!-- 	shiro 缓存管理器 -->
+	<bean id="shirocacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+		<property name="cacheManager" ref="ehcacheManager"/>
+	</bean>
+</beans>

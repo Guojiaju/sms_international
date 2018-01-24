@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Common">
+    <sql id="paging">
+        <trim prefix="limit " suffixOverrides=",">
+            <if test="paging.currentPage!=null">
+                #{paging.currentIndex}
+            </if>
+            <if test="paging.pageSize!=null">
+                ,#{paging.pageSize}
+            </if>
+        </trim>
+    </sql>
+
+    <sql id="dateRange">
+        <if test="query.startDate!=null">
+            and date <![CDATA[>=]]> #{query.startDate}
+        </if>
+
+        <if test="query.endDate!=null">
+            and date <![CDATA[<=]]> #{query.endDate}
+        </if>
+    </sql>
+</mapper>

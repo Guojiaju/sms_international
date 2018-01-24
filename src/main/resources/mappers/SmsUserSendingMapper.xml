@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sms.international.admin.mapper.SmsUserSendingMapper">
+
+    <resultMap id="BaseResultMap" type="com.sms.international.admin.model.SmsUserSending">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="mtype" jdbcType="SMALLINT" property="mtype" />
+        <result column="senddate" jdbcType="BIGINT" property="senddate" />
+        <result column="uid" jdbcType="INTEGER" property="uid" />
+        <result column="mobile" jdbcType="BIGINT" property="mobile" />
+        <result column="channel" jdbcType="INTEGER" property="channel" />
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="content_num" jdbcType="SMALLINT" property="contentNum" />
+        <result column="stat" jdbcType="SMALLINT" property="stat" />
+        <result column="release" jdbcType="SMALLINT" property="release" />
+        <result column="pid" jdbcType="INTEGER" property="pid" />
+        <result column="grade" jdbcType="SMALLINT" property="grade" />
+        <result column="expid" jdbcType="VARCHAR" property="expid" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="hisids" jdbcType="INTEGER" property="hisids" />
+        <result column="location" jdbcType="VARCHAR" property="location" />
+    </resultMap>
+
+    <sql id="column">
+        id, mtype, senddate, uid, mobile, channel, content, content_num, stat,
+        `release`, pid, grade, expid, remark, hisids, location
+    </sql>
+
+    <sql id="sending_where">
+        <where>
+            <if test="mtype != null">
+                and  mtype = #{mtype,jdbcType=SMALLINT}
+            </if>
+            <if test="uid != null">
+                and uid = #{uid,jdbcType=INTEGER}
+            </if>
+            <if test="mobile != null">
+                and mobile = #{mobile,jdbcType=BIGINT}
+            </if>
+            <if test="channel != null">
+                and channel = #{channel,jdbcType=INTEGER}
+            </if>
+            <if test="contentNum != null">
+                and content_num = #{contentNum,jdbcType=SMALLINT}
+            </if>
+            <if test="stat != null">
+                and stat = #{stat,jdbcType=SMALLINT}
+            </if>
+            <if test="release != null">
+                and release = #{release,jdbcType=SMALLINT}
+            </if>
+            <if test="pid != null">
+                and pid = #{pid,jdbcType=INTEGER}
+            </if>
+            <if test="grade != null">
+                and grade = #{grade,jdbcType=SMALLINT}
+            </if>
+            <if test="expid != null and expid!=''">
+                and expid = #{expid,jdbcType=VARCHAR}
+            </if>
+            <if test="remark != null and remark!=''">
+                and remark = #{remark,jdbcType=VARCHAR}
+            </if>
+            <if test="hisids != null">
+                and hisids = #{hisids,jdbcType=INTEGER}
+            </if>
+            <if test="content != null and content != ''">
+                    and content LIKE CONCAT(CONCAT('%', #{content,jdbcType=VARCHAR}), '%')
+             </if>
+            <if test="hand_stat !=null">
+                and hand_stat=#{hand_stat,jdbcType=INTEGER}
+            </if>
+            <if test="location !=null and location != '' ">
+                and location =#{location,jdbcType=INTEGER}
+            </if>
+            <if test="ids != null">
+                and id in
+                <foreach collection="ids" index="index" item="item" open="(" close=")" separator=",">
+                  #{item}
+                </foreach>
+            </if>
+            <if test="hand_stat != null">
+                and hand_stat = 0
+            </if>
+        </where>
+    </sql>
+
+    <select id="findByT" parameterType="com.sms.international.admin.model.SmsUserSending"  resultMap="BaseResultMap">
+        select <include refid="column"/> from sms_user_sending
+
+        <include refid="sending_where"/>
+
+        <if test="currentPageIndex != null">
+            limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+
+    </select>
+
+    <select id="findByIdsToPart" parameterType="com.sms.international.admin.model.SmsUserSending"  resultMap="BaseResultMap">
+        select <include refid="column"/> from sms_user_sending
+
+        <include refid="sending_where"/>
+
+        limit 0,1000
+    </select>
+
+    <select id="countTotal" parameterType="com.sms.international.admin.model.SmsUserSending" resultType="java.lang.Integer">
+        select count(0) from sms_user_sending
+
+        <include refid="sending_where"/>
+
+    </select>
+
+    <select id="findOne" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT <include refid="column"/> FROM sms_user_sending WHERE id = #{id}
+    </select>
+
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from sms_user_sending where id=#{id,javaType=INTEGER}
+    </delete>
+
+    <insert id="save" parameterType="com.sms.international.admin.model.SmsUserSending">
+        insert into sms_user_sending
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="mtype != null">
+                mtype,
+            </if>
+            <if test="senddate != null">
+                senddate,
+            </if>
+            <if test="uid != null">
+                uid,
+            </if>
+            <if test="mobile != null">
+                mobile,
+            </if>
+            <if test="channel != null">
+                channel,
+            </if>
+            <if test="contentNum != null">
+                content_num,
+            </if>
+            <if test="stat != null">
+                stat,
+            </if>
+            <if test="release != null">
+                release,
+            </if>
+            <if test="pid != null">
+                pid,
+            </if>
+            <if test="grade != null">
+                grade,
+            </if>
+            <if test="expid != null">
+                expid,
+            </if>
+            <if test="remark != null and remark!=''">
+                remark,
+            </if>
+            <if test="hisids != null">
+                hisids,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="location != null">
+                location,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="mtype != null">
+                #{mtype,jdbcType=SMALLINT},
+            </if>
+            <if test="senddate != null">
+                #{senddate,jdbcType=BIGINT},
+            </if>
+            <if test="uid != null">
+                #{uid,jdbcType=INTEGER},
+            </if>
+            <if test="mobile != null">
+                #{mobile,jdbcType=INTEGER},
+            </if>
+            <if test="channel != null">
+                #{channel,jdbcType=INTEGER},
+            </if>
+            <if test="contentNum != null">
+                #{contentNum,jdbcType=SMALLINT},
+            </if>
+            <if test="stat != null">
+                #{stat,jdbcType=SMALLINT},
+            </if>
+            <if test="release != null">
+                #{release,jdbcType=SMALLINT},
+            </if>
+            <if test="pid != null">
+                #{pid,jdbcType=INTEGER},
+            </if>
+            <if test="grade != null">
+                #{grade,jdbcType=SMALLINT},
+            </if>
+            <if test="expid != null">
+                #{expid,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark!=''">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="hisids != null">
+                #{hisids,jdbcType=INTEGER},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="location != null">
+                #{location,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="batchDelete" parameterType="java.util.HashMap" >
+        DELETE  from sms_user_sending where hisids IN
+        <foreach collection="ids" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <update id="update" parameterType="map">
+      update sms_user_sending
+        <set>
+            <if test="changeContent != null">
+              content= #{changeContent,jdbcType=VARCHAR}
+            </if>
+        </set>
+      where 1=1
+      and uid = #{uid,jdbcType=INTEGER}
+      and content =#{oldContent,jdbcType=VARCHAR}
+    </update>
+    <update id="batchUpdate" parameterType="java.util.HashMap">
+        update sms_user_sending
+        <set>
+            <if test="toChannel != null">
+                channel = #{toChannel,jdbcType=INTEGER},
+            </if>
+            <if test="hand_stat !=null">
+                hand_stat = #{hand_stat,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null and remark!=''">
+                remark=#{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <where>
+            <if test="ids != null">
+                and id in
+                <foreach collection="ids" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            and hand_stat = 0
+        </where>
+    </update>
+</mapper>

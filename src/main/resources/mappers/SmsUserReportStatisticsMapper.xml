@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsUserReportStatisticsMapper">
+  	
+  	<!--***********【用户日报表】开始************************* -->
+  		<select id="findSmsUserDayReportList" parameterType="com.sms.international.admin.model.SmsUserReport" resultType="com.sms.international.admin.model.SmsUserReport">
+  						SELECT sd.id ,
+				sd.uid uid,
+				sum(sd.total) total,
+				sum(sd.fail) fail,
+				sum(sd.arrive_succ) arrive_succ,
+				sum(sd.arrive_fail) arrive_fail,
+				sd.time ,
+				sum(sd.userPrice) user_price,
+				sum(sd.isReturn) isReturn,
+				u.company,
+				u.sms,
+		        c.send,
+				c.unsend
+		        FROM sms_user_day_count sd
+				left join sms_user u on u.id = sd.uid 
+				left join sms_user_consume c on sd.uid = c.uid and sd.time = c.date  
+				<where>
+					<if test="uid != null">
+						and sd.uid = #{uid,jdbcType=INTEGER}
+					</if>
+					<if test="uids != null">
+						and sd.uid in (
+						<foreach collection="uids" item="item" separator=", " >
+						   #{item}
+						</foreach>
+						)
+					</if>
+					<if test="startTime != null and startTime != ''">
+						and sd.time &gt;= #{startTime,jdbcType=INTEGER}
+					</if>
+					<if test="endTime != null and endTime != ''">
+						and sd.time &lt;= #{endTime,jdbcType=INTEGER}
+					</if>
+					<if test="company !=null and company != ''">
+						and u.company LIKE CONCAT(CONCAT('%',#{company,jdbcType=VARCHAR}),'%')
+					</if>
+					<if test="isReturn !=null">
+						and isReturn =#{isReturn,jdbcType=INTEGER}
+					</if>
+					group by sd.time,sd.uid order by sd.time,sd.total desc
+					<if test="currentPageIndex != null">
+						limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+					</if>
+				</where>
+  		</select>
+  		<select id="findSmsUserDayReportCount" parameterType="com.sms.international.admin.model.SmsUserReport" resultType="java.lang.Integer">
+  				select count(1) from (SELECT count(1) FROM sms_user_day_count sd,sms_user u
+    		 WHERE u.id = sd.uid
+			<if test="uid != null">
+				and sd.uid = #{uid,jdbcType=INTEGER}
+			</if>
+			<if test="uids != null">
+				and sd.uid in (
+				<foreach collection="uids" item="item" separator=", " >  
+		           #{item} 
+		   	 	</foreach>  
+				)
+			</if>
+			<if test="startTime != null and startTime != ''">
+				and sd.time &gt;= #{startTime,jdbcType=INTEGER}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				and sd.time &lt;= #{endTime,jdbcType=INTEGER}
+			</if>
+			<if test="company !=null and company != ''">
+				and u.company LIKE CONCAT(CONCAT('%',#{company,jdbcType=VARCHAR}),'%')
+			</if>
+			<if test="isReturn !=null">
+				and isReturn =#{isReturn,jdbcType=INTEGER}
+			</if>
+			group by sd.time,sd.uid ) a
+  		</select>
+  		
+  		<select id="findSmsUserDayReportSum" parameterType="com.sms.international.admin.model.SmsUserReport" resultType="com.sms.international.admin.model.SmsUserReport">
+  					SELECT  sum(sd.total) total, sum(sd.fail) fail,sum(sd.arrive_succ) arrive_succ,sum(sd.arrive_fail) arrive_fail ,sum(c.send) send
+		        FROM sms_user_day_count sd
+		        left join sms_user u on u.id = sd.uid
+		        left join sms_user_consume c on sd.uid = c.uid and sd.time = c.date
+		        WHERE u.id = sd.uid
+				<if test="uid != null">
+					and sd.uid = #{uid,jdbcType=INTEGER}
+				</if>
+				<if test="month != null and month != ''">
+					and left(sd.time,6)=#{month,javaType=String}
+				</if>
+				<if test="startTime != null and startTime != ''">
+					and sd.time &gt;= #{startTime,jdbcType=INTEGER}
+				</if>
+				<if test="endTime != null and endTime != ''">
+					and sd.time &lt;= #{endTime,jdbcType=INTEGER}
+				</if>
+		        <if test="company !=null and company != ''">
+		            and u.company LIKE CONCAT(CONCAT('%',#{company,jdbcType=VARCHAR}),'%')
+		        </if>
+  		</select>
+  		<select id="findSmsUserDayReportSumSend" parameterType="com.sms.international.admin.model.SmsUserReport" resultType="com.sms.international.admin.model.SmsUserReport">
+  				SELECT  sum(unsend) unsend FROM sms_user_consume
+		    		 WHERE 1=1
+				<if test="uid != null">
+					and uid = #{uid,jdbcType=INTEGER}
+				</if>
+				<if test="month != null and month != ''">
+					and left(date,6)=#{month,javaType=String}
+				</if>
+				<if test="startTime != null and startTime != ''">
+					and date &gt;= #{startTime,jdbcType=INTEGER}
+				</if>
+				<if test="endTime != null and endTime != ''">
+					and date &lt;= #{endTime,jdbcType=INTEGER}
+				</if>
+  		
+  		</select>
+     <!--***********【用户日报表】结束************************* -->
+     
+     
+     <!--***********【用户月报表】开始************************* -->
+     	<select id="findSmsUserMonthReportCount" parameterType="com.sms.international.admin.model.SmsUserReport" resultType="java.lang.Integer">
+     			select count(1) from (SELECT count(1) FROM sms_user_day_count sd,sms_user u
+	    		 WHERE u.id = sd.uid
+			<if test="uid != null">
+				and sd.uid = #{uid,jdbcType=INTEGER}
+			</if>
+			<if test="month != null and month != ''">
+				and left(sd.time,6)=#{month,javaType=String}
+			</if>
+			GROUP BY sd.uid ,u.company ,LEFT(sd.time ,6)) a
+     	</select>
+     	<select id="findSmsUserMonthReportList" parameterType="com.sms.international.admin.model.SmsUserReport" resultType="com.sms.international.admin.model.SmsUserReport">
+     			SELECT
+				sd.uid ,
+				sum(sd.total) total  ,
+				sum(sd.fail) fail,
+				sum(sd.arrive_succ) arrive_succ,
+				sum(sd.arrive_fail) arrive_fail ,
+				sum(sd.userPrice) user_price,
+				sum(c.unsend) unsend,
+				u.company
+				 FROM sms_user_day_count sd
+				 LEFT JOIN sms_user u ON u.id = sd.uid
+				 LEFT JOIN sms_user_consume c ON c.uid = sd.uid and sd.time = c.date
+				<where>
+					<if test="uid != null">
+						sd.uid = #{uid,jdbcType=INTEGER}
+					</if>
+					<if test="month != null and month != ''">
+						and left(sd.time,6)=#{month,javaType=String}
+					</if>
+					<if test="startTime != null and startTime != ''">
+						and sd.time &gt;= #{startTime,jdbcType=INTEGER}
+					</if>
+					<if test="endTime != null and endTime != ''">
+						and sd.time &lt;= #{endTime,jdbcType=INTEGER}
+					</if>
+					<if test="company !=null and company != ''">
+						and u.company LIKE CONCAT(CONCAT('%',#{company,jdbcType=VARCHAR}),'%')
+					</if>
+				</where>
+				group by sd.uid ,u.company order by total desc
+				<if test="currentPageIndex != null">
+					limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+				</if>
+     	</select>
+     
+     <!--***********【用户月报表】结束************************* -->
+     
+     
+     <!--***********【用户账单报表】开始************************* -->
+     	<select id="findUserBillList" parameterType="com.sms.international.admin.model.SmsUserReport" resultType="com.sms.international.admin.model.SmsUserReport">
+		     			SELECT sd.id ,
+				sd.uid ,
+				sd.total ,
+				sd.fail ,
+				sd.arrive_succ ,
+				sd.arrive_fail ,
+				sd.time ,
+				sd.isReturn,
+				u.company,
+				u.sms,
+		        c.send,
+				c.unsend
+		        FROM sms_user_day_count sd
+				left join sms_user u on u.id = sd.uid 
+				left join sms_user_consume c on sd.uid = c.uid and sd.time = c.date  
+				<where>
+					<if test="uid != null">
+						and sd.uid = #{uid,jdbcType=INTEGER}
+					</if>
+					<if test="uids != null">
+						and sd.uid in (
+						<foreach collection="uids" item="item" separator=", " >
+						   #{item}
+						</foreach>
+						)
+					</if>
+					<if test="startTime != null and startTime != ''">
+						and sd.time &gt;= #{startTime,jdbcType=INTEGER}
+					</if>
+					<if test="endTime != null and endTime != ''">
+						and sd.time &lt;= #{endTime,jdbcType=INTEGER}
+					</if>
+					<if test="company !=null and company != ''">
+						and u.company LIKE CONCAT(CONCAT('%',#{company,jdbcType=VARCHAR}),'%')
+					</if>
+					<if test="isReturn !=null">
+						and isReturn =#{isReturn,jdbcType=INTEGER}
+					</if>
+					order by sd.time,sd.total desc
+					<if test="currentPageIndex != null">
+						limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+					</if>
+				</where>
+     	</select>
+     	<select id="findUserBillCount" parameterType="com.sms.international.admin.model.SmsUserReport" resultType="java.lang.Integer">
+     			SELECT count(1) FROM sms_user_day_count sd,sms_user u
+	    		 WHERE u.id = sd.uid
+			<if test="uid != null">
+				and sd.uid = #{uid,jdbcType=INTEGER}
+			</if>
+			<if test="uids != null">
+				and sd.uid in (
+				<foreach collection="uids" item="item" separator=", " >  
+		           #{item} 
+		   	 	</foreach>  
+				)
+			</if>
+			<if test="startTime != null and startTime != ''">
+				and sd.time &gt;= #{startTime,jdbcType=INTEGER}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				and sd.time &lt;= #{endTime,jdbcType=INTEGER}
+			</if>
+			<if test="company !=null and company != ''">
+				and u.company LIKE CONCAT(CONCAT('%',#{company,jdbcType=VARCHAR}),'%')
+			</if>
+			<if test="isReturn !=null">
+				and isReturn =#{isReturn,jdbcType=INTEGER}
+			</if>
+     	</select>
+     <!--***********【用户账单报表】结束************************* -->
+     
+     
+     <!--****************【用户日报表详情】开始****************** -->
+     	<select id="findUserDayDetailList" parameterType="com.sms.international.admin.model.SmsUserReport" resultType="com.sms.international.admin.model.SmsUserReport">
+  						SELECT sd.id ,
+				sd.uid ,
+				sd.total,
+				sd.fail,
+				sd.arrive_succ,
+				sd.arrive_fail,
+				sd.time ,
+				sd.userPrice user_price,
+				sd.isReturn,
+				sd.countryId,
+				u.company,
+				u.sms,
+		        c.send,
+				c.unsend
+		        FROM sms_user_day_count sd
+				left join sms_user u on u.id = sd.uid 
+				left join sms_user_consume c on sd.uid = c.uid and sd.time = c.date  
+				<where>
+					<if test="uid != null">
+						and sd.uid = #{uid,jdbcType=INTEGER}
+					</if>
+					<if test="uids != null">
+						and sd.uid in (
+						<foreach collection="uids" item="item" separator=", " >
+						   #{item}
+						</foreach>
+						)
+					</if>
+					<if test="startTime != null and startTime != ''">
+						and sd.time=#{startTime,jdbcType=INTEGER}
+					</if>
+					
+					<if test="company !=null and company != ''">
+						and u.company LIKE CONCAT(CONCAT('%',#{company,jdbcType=VARCHAR}),'%')
+					</if>
+					<if test="isReturn !=null">
+						and isReturn =#{isReturn,jdbcType=INTEGER}
+					</if>
+					<if test="currentPageIndex != null">
+						limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+					</if>
+				</where>
+  		</select>
+  		<select id="findUserDayDetailCount" parameterType="com.sms.international.admin.model.SmsUserReport" resultType="java.lang.Integer">
+  				SELECT count(1) FROM sms_user_day_count sd,sms_user u
+    		 WHERE u.id = sd.uid
+			<if test="uid != null">
+				and sd.uid = #{uid,jdbcType=INTEGER}
+			</if>
+			<if test="uids != null">
+				and sd.uid in (
+				<foreach collection="uids" item="item" separator=", " >  
+		           #{item} 
+		   	 	</foreach>  
+				)
+			</if>
+			<if test="startTime != null and startTime != ''">
+				and sd.time = #{startTime,jdbcType=INTEGER}
+			</if>
+			
+			<if test="company !=null and company != ''">
+				and u.company LIKE CONCAT(CONCAT('%',#{company,jdbcType=VARCHAR}),'%')
+			</if>
+			<if test="isReturn !=null">
+				and isReturn =#{isReturn,jdbcType=INTEGER}
+			</if>
+  		</select>
+     <!--****************【用户日报表详情】结束****************** -->
+     
+     
+     <!-- *********【用户月报表详情】开始*************-->
+     	<select id="findUserMonthDetailCount" parameterType="com.sms.international.admin.model.SmsUserReport" resultType="java.lang.Integer">
+     			select count(1) from (SELECT count(1) FROM sms_user_day_count sd,sms_user u
+	    		 WHERE u.id = sd.uid
+			<if test="uid != null and uid>0">
+				and sd.uid = #{uid,jdbcType=INTEGER}
+			</if>
+			<if test="month != null and month != ''">
+				and left(sd.time,6)=#{month,javaType=String}
+			</if>
+			) a
+     	</select>
+     	<select id="findUserMonthDetailList" parameterType="com.sms.international.admin.model.SmsUserReport" resultType="com.sms.international.admin.model.SmsUserReport">
+     			SELECT
+				sd.uid,
+				sd.total total,
+				sd.fail fail,
+				sd.countryId,
+				sd.arrive_succ arrive_succ,
+				sd.arrive_fail arrive_fail ,
+				sd.userPrice user_price
+				c.unsend unsend,
+				u.company
+				 FROM sms_user_day_count sd
+				 LEFT JOIN sms_user u ON u.id = sd.uid
+				 LEFT JOIN sms_user_consume c ON c.uid = sd.uid and sd.time = c.date
+				<where>
+					<if test="uid != null and uid>0">
+						sd.uid = #{uid,jdbcType=INTEGER}
+					</if>
+					<if test="month != null and month != ''">
+						and left(sd.time,6)=#{month,javaType=String}
+					</if>
+					<if test="startTime != null and startTime != ''">
+						and sd.time &gt;= #{startTime,jdbcType=INTEGER}
+					</if>
+					<if test="endTime != null and endTime != ''">
+						and sd.time &lt;= #{endTime,jdbcType=INTEGER}
+					</if>
+					<if test="company !=null and company != ''">
+						and u.company LIKE CONCAT(CONCAT('%',#{company,jdbcType=VARCHAR}),'%')
+					</if>
+				</where>
+				 order by total desc
+				<if test="currentPageIndex != null">
+					limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+				</if>
+     	</select>
+     <!-- **********【用户月报表详情】结束********** -->
+     
+</mapper>

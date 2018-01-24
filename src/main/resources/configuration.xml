@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<mappers>
+		<mapper resource="mappers/AdminMapper.xml"/>
+		<mapper resource="mappers/CommonMapper.xml"/>
+		<mapper resource="mappers/MenuMapper.xml"/>
+		<mapper resource="mappers/RoleMapper.xml"/>
+		<mapper resource="mappers/SmsAdminLogsMapper.xml"/>
+		<mapper resource="mappers/SmsUserMapper.xml"/>
+		<mapper resource="mappers/SmsCustomerMapper.xml"/>
+		<mapper resource="mappers/SmsChannelPriceMenuMapper.xml"/>
+		<mapper resource="mappers/SmsCountryInfosMapper.xml"/>
+		<mapper resource="mappers/SmsUserControlMapper.xml"/>
+		<mapper resource="mappers/SmsUserPriceMenuMapper.xml"/>
+		<mapper resource="mappers/SmsChannelMapper.xml"/>
+		<mapper resource="mappers/CaiwuAccPassMapper.xml"/>
+		<mapper resource="mappers/SmsChargeRecordsMapper.xml"/>
+		<mapper resource="mappers/SmsSendHistoryMapper.xml"/>
+		<mapper resource="mappers/SmsRptBeforeMapper.xml"/>
+		<mapper resource="mappers/SmsUserLogsMapper.xml"/>
+		<mapper resource="mappers/SmsAdminLogsMapper.xml"/>
+        <mapper resource="mappers/SmsUserSendingMapper.xml"/>
+		<mapper resource="mappers/SmsBlackMobileMapper.xml"/>
+        <mapper resource="mappers/SmsMobileAreaMapper.xml"/>
+        <mapper resource="mappers/ReCountedToUidMapper.xml"/>
+        <mapper resource="mappers/SmsUserSendTimeingMapper.xml"/>
+		<mapper resource="mappers/SmsReportStatisticsMapper.xml"/>
+		<mapper resource="mappers/SmsBlackMobileTypeMapper.xml"/>
+		<mapper resource="mappers/SmsUserReportStatisticsMapper.xml"/>
+		<mapper resource="mappers/SmsSignStoreMapper.xml"/>
+		<mapper resource="mappers/SmsUserSendingReleaseMapper.xml"/>
+		<mapper resource="mappers/SmsAnalysisChartMapper.xml"/>
+		<mapper resource="mappers/SmsBlackWordsMapper.xml"/>
+		<mapper resource="mappers/SmsBlackWordsTypeMapper.xml"/>
+		<mapper resource="mappers/SmsUserConsumeMapper.xml"/>
+		<mapper resource="mappers/SmsPriceTemplateMapper.xml"/>
+		<mapper resource="mappers/SmsPriceTemplateDetailsMapper.xml"/>
+	</mappers>
+</configuration>

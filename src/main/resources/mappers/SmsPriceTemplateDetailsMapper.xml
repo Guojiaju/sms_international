@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsPriceTemplateDetailsMapper">
+    <resultMap id="BaseResultMap" type="com.sms.international.admin.model.SmsPriceTemplateDetail">
+        <result column="country" property="country" jdbcType="VARCHAR"/>
+        <result column="countryId" property="countryId" jdbcType="INTEGER"/>
+        <result column="price" property="price" jdbcType="DOUBLE"/>
+        <result column="temp_id" property="temp_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="findByTempId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select country,countryId,price,temp_id
+        from sioo_sms_international.sms_price_template_detail
+        WHERE temp_id =#{temp_id,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteByTempId" parameterType="java.lang.Integer">
+        delete from sioo_sms_international.sms_price_template_detail
+        where temp_id =#{temp_id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="batchSave">
+        <selectKey keyColumn="id" resultType="java.lang.Integer" order="AFTER">
+            select @@IDENTITY
+        </selectKey>
+        insert into sioo_sms_international.sms_price_template_detail
+        (countryId, country, price, temp_id)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.countryId},#{item.country},#{item.price},#{item.temp_id})
+        </foreach>
+    </insert>
+</mapper>

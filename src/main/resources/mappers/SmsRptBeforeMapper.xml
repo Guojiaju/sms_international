@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsReportMapper">
+	<resultMap id="rptBeforeMap" type="com.sms.international.admin.model.SmsReport">
+        <result column="uid" property="uid" javaType="java.lang.Integer"/>
+        <result column="mobile" property="mobile" javaType="java.lang.Long"/>
+        <result column="rptcode" property="rptcode" javaType="java.lang.String"/>
+        <result column="hisId" property="hisId" javaType="java.lang.Long"/>
+        <result column="pid" property="pid" javaType="java.lang.Long"/>
+        <result column="rpttime" property="rpttime" javaType="java.lang.String"/>
+        <result column="channelId" property="channelId" javaType="java.lang.Integer"/>
+        <result column="userday" property="userday" javaType="java.lang.Integer"/>
+        <result column="extend1" property="extend1" javaType="java.lang.String"/>
+        <result column="extend2" property="extend2" javaType="java.lang.Integer"/>
+    </resultMap>
+    
+    <sql id="rptbefore_where">
+        <where>
+            <if test="channelId !=null">
+                and channelId=#{channelId,javaType=INTEGER}
+            </if>
+            <if test="uid !=null">
+                and uid=#{uid,javaType=INTEGER}
+            </if>
+            <if test="mobile !=null">
+                and mobile=#{mobile,javaType=LONG}
+            </if>
+            <if test="hisId !=null">
+                and hisId=#{hisId,javaType=LONG}
+            </if>
+        </where>
+    </sql>
+    
+    <select id="findRptList" parameterType="com.sms.international.admin.model.SmsReport"  resultMap="rptBeforeMap">
+        SELECT uid,mobile,rptcode,hisId,pid,DATE_FORMAT(rpttime,'%Y-%m-%d %H:%i:%s') as rpttime,channelId,userday,stat,extend1,extend2 FROM sioo_sms_international.sms_rpt_backups
+        <include refid="rptbefore_where"/>
+        <if test="currentPageIndex != null">
+            limit #{currentPageIndex,javaType=Integer},#{pageSize,javaType=Integer}
+        </if>
+    </select>
+    
+    <select id="countTotal" parameterType="com.sms.international.admin.model.SmsReport" resultType="java.lang.Integer">
+        select count(0) from sioo_sms_international.sms_rpt_backups
+        <include refid="rptbefore_where"/>
+    </select>
+</mapper>

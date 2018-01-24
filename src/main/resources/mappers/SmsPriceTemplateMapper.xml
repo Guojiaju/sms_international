@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsPriceTemplateMapper">
+    <resultMap id="BaseResultMap" type="com.sms.international.admin.model.SmsPriceTemplate">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="addTime" property="addTime" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Select_List">
+        <where>
+            <if test="id != null">
+                AND id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="name != null and name != ''">
+                AND name like concat('%', #{name,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="status != null">
+                AND status =#{status,jdbcType=INTEGER}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findByT" resultMap="BaseResultMap" parameterType="com.sms.international.admin.model.SmsPriceTemplate">
+        select id , name ,description , status , addTime
+        from sioo_sms_international.sms_price_template
+        <include refid="Base_Select_List"/>
+        <if test="currentPageIndex != null">
+            limit #{currentPageIndex,javaType=Integer},#{pageSize,javaType=Integer}
+        </if>
+    </select>
+
+    <select id="countTotal" resultType="java.lang.Integer" parameterType="com.sms.international.admin.model.SmsPriceTemplate">
+        select count(0)
+        from sioo_sms_international.sms_price_template c
+        <include refid="Base_Select_List"/>
+    </select>
+
+    <select id="findOne" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select id , name ,description , status , addTime
+        from sioo_sms_international.sms_price_template
+        where id =#{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        select id , name ,description , status , addTime
+        from sioo_sms_international.sms_price_template
+        where status = 0
+    </select>
+
+    <insert id="save" parameterType="com.sms.international.admin.model.SmsPriceTemplate">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+            SELECT @@IDENTITY
+        </selectKey>
+        insert into sioo_sms_international.sms_price_template
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id !=null and id > 0">
+                id,
+            </if>
+            <if test="name !=null and name !=''">
+                name,
+            </if>
+            <if test="description !=null and description !=''">
+                description,
+            </if>
+            <if test="status !=null">
+                status,
+            </if>
+            <if test="addTime !=null and addTime != ''">
+                addTime
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id !=null and id > 0">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name !=null and name !=''">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="description !=null and description !=''">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="status !=null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="addTime !=null and addTime != ''">
+                #{addTime,jdbcType=VARCHAR}
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.sms.international.admin.model.SmsPriceTemplate">
+        update sioo_sms_international.sms_price_template
+        <set>
+            <if test="name !=null and name !=''">
+               name =#{name,jdbcType=VARCHAR},
+            </if>
+            <if test="description !=null and description !=''">
+               description =#{description,jdbcType=VARCHAR},
+            </if>
+            <if test="status !=null">
+               status =#{status,jdbcType=INTEGER},
+            </if>
+            <if test="addTime !=null and addTime != ''">
+                addTime =#{addTime,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where id = #{id,javaType=INTEGER}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from sioo_sms_international.sms_price_template
+        where id =#{id,jdbcType=VARCHAR}
+    </delete>
+</mapper>

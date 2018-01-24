@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.RoleMapper">
+
+	<resultMap id="BaseResultMap" type="com.sms.international.admin.model.Role" >
+	    <id column="id" property="id" jdbcType="INTEGER" />
+	    <result column="roleName" property="roleName" jdbcType="VARCHAR" />
+	    <result column="status" property="status" jdbcType="INTEGER" />
+	    <result column="description" property="description" jdbcType="VARCHAR" />
+	    <result column="createDate" property="createDate" jdbcType="TIMESTAMP" />
+	  </resultMap>
+	  
+	  <resultMap id="IdsResultMap" type="com.sms.international.admin.model.Role" >
+	    <id column="id" property="id" jdbcType="INTEGER" />
+	  </resultMap>
+
+	<resultMap id="bindResultMap" type="com.sms.international.admin.model.Role" >
+	    <id column="id" property="id" jdbcType="INTEGER" />
+	    <result column="roleName" property="roleName" jdbcType="VARCHAR" />
+	    <result column="checked" property="checked" jdbcType="VARCHAR" />
+	  </resultMap>
+	  
+	<insert id="saveRole" parameterType="com.sms.international.admin.model.Role" >
+  	<selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+	    SELECT @@IDENTITY
+	</selectKey>
+    insert into sioo_sms_international.role
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+       
+      <if test="roleName != null" >
+        roleName,
+      </if>
+      
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+      <if test="createDate != null" >
+        createDate
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+     
+      <if test="roleName != null" >
+        #{roleName,jdbcType=VARCHAR},
+      </if>
+      
+      <if test="status != null" >
+       #{status,jdbcType=INTEGER},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="update" parameterType="com.sms.international.admin.model.Role">
+    update sioo_sms_international.role
+    <set >
+      <if test="roleName != null" >
+        roleName = #{roleName,jdbcType=VARCHAR},
+      </if>
+      
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null and createDate != ''" >
+        createDate = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <update id="disableRole" parameterType="java.lang.Integer">
+    update sioo_sms_international.role
+    <set >
+        status = -1,
+    </set>
+    where id = #{roleId,jdbcType=INTEGER}
+  </update>
+  
+  <select id="findRole" resultMap="BaseResultMap" parameterType="com.sms.international.admin.model.Role" >
+    select id,roleName,status,description,createDate from sioo_sms_international.role
+    <where >
+      <if test="id != null" >
+        AND id = #{id,jdbcType=INTEGER}
+      </if>
+      <if test="roleName != null and roleName != ''" >
+        AND roleName LIKE CONCAT(CONCAT('%', #{roleName,jdbcType=VARCHAR}), '%')
+      </if>
+      
+      <if test="createDate != null" >
+        AND createDate = #{createDate,jdbcType=TIMESTAMP}
+      </if>
+      <if test="status != null" >
+        AND status = #{status,jdbcType=INTEGER}
+      </if>
+    </where>
+    ORDER BY id DESC
+  </select>
+  
+  <select id="findAdminOrRole" resultMap="bindResultMap" parameterType="java.lang.Integer" >
+      SELECT
+			m1.id,m1.roleName,'checked="checked"' checked
+		FROM
+			role m1
+		LEFT JOIN sioo_sms_international.admin_role mg ON m1.id = mg.rid
+		WHERE
+			mg.uid = #{adminId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="findAdminForRole" resultMap="IdsResultMap" parameterType="java.lang.Integer" >
+      SELECT rid id FROM sioo_sms_international.admin_role WHERE uid = #{adminId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="findRoleForAdmin" resultType="java.lang.String" parameterType="java.util.List" >
+      SELECT sa.realname id FROM sioo_sms_international.admin_role ar,sioo_sms_international.sms_admin sa 
+      where 1 = 1 
+      and ar.uid = sa.id
+      and rid in 
+      <foreach collection="list" item="rid" open="(" close=")" separator=",">
+      		#{rid}
+      </foreach>
+      
+  </select>
+  
+  <select id="findRoleForAdminId" resultType="java.lang.Integer" parameterType="java.util.List" >
+      SELECT sa.id id FROM sioo_sms_international.admin_role ar,sioo_sms_international.sms_admin sa 
+      where 1 = 1 
+      and ar.uid = sa.id
+      and rid in 
+      <foreach collection="list" item="rid" open="(" close=")" separator=",">
+      		#{rid}
+      </foreach>
+      
+  </select>
+
+<select id="queryAllTotal" resultType="java.lang.Integer" parameterType="com.sms.international.admin.model.Role" >
+    select count(id) from sioo_sms_international.role
+    <where >
+      <if test="id != null" >
+        AND id = #{id,jdbcType=INTEGER}
+      </if>
+      <if test="roleName != null and roleName != ''" >
+        AND roleName LIKE CONCAT(CONCAT('%', #{roleName,jdbcType=VARCHAR}), '%')
+      </if>
+      <if test="status != null" >
+        AND status = #{status,jdbcType=INTEGER}
+      </if>
+    </where>
+  </select>
+  
+  <delete id="delGroupMenu" parameterType="java.lang.Integer" >
+  	delete from sioo_sms_international.department_menu where departid = #{id}
+  </delete>
+  
+  <insert id="insGroupMenu" parameterType="map" >
+  	 insert into sioo_sms_international.department_menu values(#{departid},#{menuid})
+  </insert>
+  
+  <select id="findAllAndChecked" resultMap="bindResultMap" parameterType="map" >
+      select m.id,m.roleName,
+	  (select 'checked="checked"' from sioo_sms_international.admin_role gm where gm.rid = m.id and gm.uid = #{uid,jdbcType=INTEGER}) checked
+	  from 
+	  (SELECT m1.* FROM role m1 LEFT JOIN sioo_sms_international.admin_role mg ON m1.id = mg.rid )
+	  m GROUP BY m.id
+  </select>
+  
+  <select id="selectRolesByAdminId"  resultMap="BaseResultMap" parameterType="java.lang.Integer">
+  	select id,roleName,description from role where status = 0 and exists(select 1 from admin_role where admin_role.uid=#{id,jdbcType=INTEGER} and admin_role.rid = role.id)
+  </select>
+</mapper>

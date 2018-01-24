@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsReportStatisticsMapper">
+  	<select id="findGatewayChannelList" parameterType="com.sms.international.admin.model.SmsGatewayChannel" resultType="com.sms.international.admin.model.SmsGatewayChannel">
+  		select id,gateway_template,gateway_port,gateway_ip,gateway_account,gateway_pass,gateway_url,local_ip,local_delay,local_read_num,rabbit_port,rabbit_ip,rabbit_account,channel_provider,rabbit_pass,channel_name,status,price,remark,send_words_len,send_words_maxlen
+  		 from gateway_channel where 1=1
+  	</select>
+
+	<select id="findGatewayChannelCount" parameterType="com.sms.international.admin.model.SmsGatewayChannel" resultType="java.lang.Integer">
+		select count(id) from gateway_channel
+	</select>
+
+
+	<!--*******通道日报表********* -->
+	<select id="findChannelDaySum" parameterType="com.sms.international.admin.model.SmsGatewayChannel" resultType="com.sms.international.admin.model.SmsReportChannel">
+			SELECT
+		sum(c.submit_count) submit_count ,
+		sum(c.submit_succ) submit_succ ,
+		sum(c.submit_fail) submit_fail ,
+		sum(c.report_count) report_count ,
+		sum(c.report_succ) report_succ ,
+		sum(c.report_fail) report_fail FROM channel_day_count c ,
+		gateway_channel g WHERE g.id = c.channelId
+		<if test="channelid != null and channelid>0">
+			and c.channelId=#{channelid,javaType=INTEGER}
+		</if>
+		<if test="startTime!= null and startTime>0">
+			and c.create_time &gt;= #{startTime,jdbcType=BIGINT}
+		</if>
+		<if test="endTime!= null and endTime>0">
+			and c.create_time &lt;= #{endTime,jdbcType=BIGINT}
+		</if>
+	</select>
+	<select id="findChannelDayCount" parameterType="com.sms.international.admin.model.SmsReportChannel" resultType="java.lang.Integer">
+		select count(0) from (select count(0) from channel_day_count c,gateway_channel g
+		where g.id=c.channelId
+		<if test="channelid != null and channelid>0">
+			and c.channelId=#{channelid,javaType=INTEGER}
+		</if>
+
+		<if test="startTime!= null and startTime>0">
+			and c.create_time &gt;= #{startTime,jdbcType=BIGINT}
+		</if>
+		<if test="endTime!= null and endTime>0">
+			and c.create_time &lt;= #{endTime,jdbcType=BIGINT}
+		</if>
+		group by create_time,channelId ) a
+	</select>
+	<select id="findChannelDayList" parameterType="com.sms.international.admin.model.SmsReportChannel" resultType="com.sms.international.admin.model.SmsReportChannel">
+		select c.channelId channelid
+		,sum(c.submit_count) submit_count,sum(c.submit_succ) submit_succ,sum(c.submit_fail) submit_fail,sum(c.report_count) report_count,sum(c.report_succ) report_succ,sum(c.report_fail) report_fail,c.create_time
+		,g.channel_name channelName from channel_day_count c,gateway_channel g
+		where g.id=c.channelId
+		<if test="channelid != null and channelid>0">
+			and c.channelId=#{channelid,javaType=INTEGER}
+		</if>
+
+		<if test="startTime!= null and startTime>0">
+			and c.create_time &gt;= #{startTime,jdbcType=BIGINT}
+		</if>
+		<if test="endTime!= null and endTime>0">
+			and c.create_time &lt;= #{endTime,jdbcType=BIGINT}
+		</if>
+			group by create_time,channelId order by c.create_time desc,c.submit_count desc
+       <if test="currentPageIndex != null">
+            limit #{currentPageIndex,javaType=Integer},#{pageSize,javaType=Integer}
+       </if>
+	</select>
+	<!-- ********通道日报表结束****** -->
+	
+	<!-- ***********通道月报表************-->
+		<select id="findChannelMonthCount" parameterType="com.sms.international.admin.model.SmsReportChannel" resultType="java.lang.Integer">
+			select count(1) from ( SELECT count(0) FROM channel_day_count c ,gateway_channel g WHERE g.id = c.channelId
+			<if test="channelid != null and channelid>0">
+				and c.channelId=#{channelid,javaType=INTEGER}
+			</if>
+			<if test="month != null ">
+				AND left(c.create_time,6)=#{month,javaType=String}
+			</if>
+				GROUP BY g.channel_name,c.channelId ,LEFT(c.create_time ,6)) a
+		</select>
+	<select id="findChannelMonthList" parameterType="com.sms.international.admin.model.SmsReportChannel" resultType="com.sms.international.admin.model.SmsReportChannel">
+				SELECT
+			c.channelId channelid,
+			g.channel_name channelName,
+			sum(c.submit_count) submit_count ,
+			sum(c.submit_succ) submit_succ ,
+			sum(c.submit_fail) submit_fail ,
+			sum(c.report_count) report_count ,
+			sum(c.report_succ) report_succ ,
+			sum(c.report_fail) report_fail FROM channel_day_count c ,
+			gateway_channel g WHERE g.id = c.channelId
+			<if test="channelid != null and channelid>0">
+				and c.channelId=#{channelid,javaType=INTEGER}
+			</if>
+			<if test="month != null ">
+				AND left(c.create_time,6)=#{month,javaType=String}
+			</if>
+			GROUP BY g.channel_name,c.channelId
+			order by submit_count desc
+			<if test="currentPageIndex != null">
+				limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+			</if>
+		</select>
+		<select id="findChannelMonthSum" parameterType="com.sms.international.admin.model.SmsReportChannel" resultType="com.sms.international.admin.model.SmsReportChannel">
+					SELECT
+				sum(c.submit_count) submit_count ,
+				sum(c.submit_succ) submit_succ ,
+				sum(c.submit_fail) submit_fail ,
+				sum(c.report_count) report_count ,
+				sum(c.report_succ) report_succ ,
+				sum(c.report_fail) report_fail FROM channel_day_count c ,
+				gateway_channel g WHERE g.id = c.channelId
+				<if test="channelid != null and channelid>0">
+					and c.channelId=#{channelid,javaType=INTEGER}
+				</if>
+				<if test="month != null ">
+					AND left(c.create_time,6)=#{month,javaType=String}
+				</if>
+		</select>
+	<!-- ***********通道月报表************-->
+	
+	
+	<!-- 通道日统计详情开始 -->
+		<select id="findChannelDayDetailCount" parameterType="com.sms.international.admin.model.SmsReportChannel" resultType="java.lang.Integer">
+				select count(0) from channel_day_count c  where 1=1
+			<if test="channelid != null and channelid>0">
+				and c.channelId=#{channelid,javaType=INTEGER}
+			</if>
+	
+			<if test="startTime!= null and startTime>0">
+				and c.create_time=#{startTime,jdbcType=BIGINT}
+			</if>
+		</select>
+		<select id="findChannelDayDetailList" parameterType="com.sms.international.admin.model.SmsReportChannel" resultType="com.sms.international.admin.model.SmsReportChannel">
+				select c.channelId channelid
+				,c.submit_count,c.submit_succ,c.submit_fail,c.report_count,c.report_succ,c.report_fail,c.create_time
+				,g.channel_name channelName,countryId from channel_day_count c,gateway_channel g
+				where g.id=c.channelId
+			<if test="channelid != null and channelid>0">
+				and c.channelId=#{channelid,javaType=INTEGER}
+			</if>
+	
+			<if test="startTime!= null and startTime>0">
+				and c.create_time= #{startTime,jdbcType=BIGINT}
+			</if>
+			order by c.create_time desc,c.submit_count desc
+	       <if test="currentPageIndex != null">
+	            limit #{currentPageIndex,javaType=Integer},#{pageSize,javaType=Integer}
+	       </if>
+		</select>
+	<!-- 通道日统计详情结束 -->
+	
+	
+	<!-- 通道月报表统计详情开始 -->
+		<select id="findChannelMonthDetailCount" parameterType="com.sms.international.admin.model.SmsReportChannel" resultType="java.lang.Integer">
+			select count(1) from ( SELECT count(0) FROM channel_day_count c ,gateway_channel g WHERE g.id = c.channelId
+			<if test="channelid != null and channelid>0">
+				and c.channelId=#{channelid,javaType=INTEGER}
+			</if>
+			<if test="month != null ">
+				AND left(c.create_time,6)=#{month,javaType=String}
+			</if>
+				) a
+		</select>
+	<select id="findChannelMonthDetailList" parameterType="com.sms.international.admin.model.SmsReportChannel" resultType="com.sms.international.admin.model.SmsReportChannel">
+				SELECT
+			c.channelId channelid,
+			c.countryId countryId,
+			g.channel_name channelName,
+			c.submit_count submit_count ,
+			c.submit_succ submit_succ ,
+			c.submit_fail submit_fail ,
+			c.report_count report_count ,
+			c.report_succ report_succ ,
+			
+			c.report_fail report_fail FROM channel_day_count c ,
+			gateway_channel g WHERE g.id = c.channelId
+			<if test="channelid != null and channelid>0">
+				and c.channelId=#{channelid,javaType=INTEGER}
+			</if>
+			<if test="month != null ">
+				AND left(c.create_time,6)=#{month,javaType=String}
+			</if>
+			order by submit_count desc
+			<if test="currentPageIndex != null">
+				limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+			</if>
+		</select>
+	
+	<!-- 通道月报表统计详情结束 -->
+	
+</mapper>

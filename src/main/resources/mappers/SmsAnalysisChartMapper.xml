@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsAnalysisChartMapper">
+  	
+<!--*******************【单日发送量趋势图】开始*************-->
+  	<select id="findAllUserSendDayCount" parameterType="com.sms.international.admin.model.SmsAnalysisChart" resultType="com.sms.international.admin.model.SmsAnalysisChart">
+		select sum(send) as send_count,date as bill_time from sms_user_consume where date &gt;=#{startTime} and date &lt;=#{endTime} group by date order by date asc
+	</select>
+  	<select id="findAllUserSuccessSendDayCount" parameterType="com.sms.international.admin.model.SmsAnalysisChart" resultType="com.sms.international.admin.model.SmsAnalysisChart">
+		select sum(arrive_succ) as send_count,time as bill_time from sms_user_day_count where time &gt;=#{startTime} and time &lt;=#{endTime} group by time order by time asc
+	</select>
+	<select id="findAllUserFailSendDayCount" parameterType="com.sms.international.admin.model.SmsAnalysisChart" resultType="com.sms.international.admin.model.SmsAnalysisChart">
+		select sum(fail+arrive_fail) as send_count,time as bill_time from sms_user_day_count where time &gt;=#{startTime} and time &lt;=#{endTime} group by time order by time asc
+	</select>
+	
+	<select id="findAllUserMonthAllSendCount" parameterType="com.sms.international.admin.model.SmsAnalysisChart" resultType="java.lang.Integer">
+		select sum(total) as send_count from sms_user_day_count where time &gt;=#{startTime} and time &lt;=#{endTime}
+	</select>
+	<select id="findAllUserMonthAllSuccessCount" parameterType="com.sms.international.admin.model.SmsAnalysisChart" resultType="java.lang.Integer">
+		select sum(arrive_succ) as send_count,time as bill_time from sms_user_day_count where time &gt;=#{startTime} and time &lt;=#{endTime}
+	</select>
+	<select id="findAllUserMonthAllFailCount" parameterType="com.sms.international.admin.model.SmsAnalysisChart" resultType="java.lang.Integer">
+		select sum(fail+arrive_fail) as send_count,time as bill_time from sms_user_day_count where time &gt;=#{startTime} and time &lt;=#{endTime}
+	</select>
+	
+<!--*******************【单日发送量趋势图】结束*************-->
+
+<!--******************【月发送趋势图】开始**************** -->
+	<select id="findAllUserSingMonthSendCount" parameterType="com.sms.international.admin.model.SmsAnalysisChart" resultType="com.sms.international.admin.model.SmsAnalysisChart">
+		select sum(send) as send_count,substring(date from 1 for 6) as bill_time from sms_user_consume
+		 	where date &gt;=#{startTime} and date &lt;=#{endTime}
+				 group by substring(date from 1 for 6) order by bill_time asc
+	</select>
+	<!--初始化查询月线统计数据 【月发送成功总量】-->
+	<select id="findAllUserSingMongthSuccessCount" parameterType="com.sms.international.admin.model.SmsAnalysisChart" resultType="com.sms.international.admin.model.SmsAnalysisChart">
+		select sum(arrive_succ) as send_count,substring(time from 1 for 6) as bill_time from sms_user_day_count 
+			where time &gt;=#{startTime} and time &lt;=#{endTime}
+			group by substring(time from 1 for 6) order by bill_time asc
+	</select>
+	<!--初始化查询月线统计数据 【月发送失败总量】-->
+	<select id="findAllUserSingMongthFailCount" parameterType="com.sms.international.admin.model.SmsAnalysisChart" resultType="com.sms.international.admin.model.SmsAnalysisChart">
+		select sum(fail+arrive_fail) as send_count,substring(time from 1 for 6) as bill_time from sms_user_day_count 
+			where time &gt;=#{startTime} and time &lt;=#{endTime}
+			group by substring(time from 1 for 6) order by bill_time asc
+	</select>
+<!--******************【月发送趋势图】结束**************** -->
+
+<!--******************【单日国家趋势图】开始**************** -->
+<select id="findCountryDayChart" parameterType="com.sms.international.admin.model.SmsAnalysisChart" resultType="com.sms.international.admin.model.SmsAnalysisChart">
+	select sum(total) send_count,sum(userPrice) user_price,countryId 
+	from sms_user_day_count where time=#{bill_time} group by countryId order by total
+</select>
+<select id="findCountryDaySumCount" parameterType="com.sms.international.admin.model.SmsAnalysisChart" resultType="com.sms.international.admin.model.SmsAnalysisChart">
+	select sum(total) send_count,sum(userPrice) user_price from sms_user_day_count where time=#{bill_time}
+</select>
+<!--******************【单日国家趋势图】结束**************** -->
+</mapper>

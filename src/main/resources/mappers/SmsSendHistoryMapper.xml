@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sms.international.admin.mapper.SmsSendHistoryMapper">
+    <resultMap id="BaseResultMap" type="com.sms.international.admin.model.SmsSendHistory">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="senddate" property="senddate" jdbcType="INTEGER"/>
+        <result column="uid" property="uid" jdbcType="INTEGER"/>
+        <result column="mobile" property="mobile" jdbcType="INTEGER"/>
+        <result column="channel" property="channel" jdbcType="INTEGER"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="contentNum" property="contentNum" jdbcType="INTEGER"/>
+        <result column="succ" property="succ" jdbcType="INTEGER"/>
+        <result column="fail" property="fail" jdbcType="INTEGER"/>
+        <result column="mtstat" property="mtstat" jdbcType="INTEGER"/>
+        <result column="pid" property="pid" jdbcType="INTEGER"/>
+        <result column="grade" property="grade" jdbcType="INTEGER"/>
+        <result column="expid" property="expid" jdbcType="INTEGER"/>
+        <result column="location" property="location" jdbcType="VARCHAR"/>
+        <result column="arrive_succ" property="arriveSucc" jdbcType="INTEGER"/>
+        <result column="arrive_fail" property="arriveFail" jdbcType="INTEGER"/>
+        <result column="stat" property="stat" jdbcType="INTEGER"/>
+    </resultMap>
+
+
+    <sql id="sendHistory_where">
+        <where>
+            <if test="startTime != null and startTime>0">
+                and senddate&gt;=#{startTime,jdbcType=BIGINT}
+            </if>
+			<if test="endTime != null and endTime>0">
+                and senddate&lt;=#{endTime,jdbcType=BIGINT}
+            </if>
+            <if test="uid !=null and uid>0">
+                and uid=#{uid,javaType=INTEGER}
+            </if>
+            <if test="mobile !=null and mobile>0">
+                and mobile=#{mobile,jdbcType=INTEGER}
+            </if>
+            <if test="channel!=null and channel>0">
+                and channel=#{channel,javaType=INTEGER}
+            </if>
+            <if test="content!=null and content!=''">
+                and content like concat(concat('%',#{content,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="location !=null and location!=''">
+                and location =#{location,jdbcType=VARCHAR}
+            </if>
+             <if test="stat!=null">
+                and stat=#{stat,jdbcType=INTEGER}
+            </if>
+            <if test="mtstat!=null and mtstat!=''">
+                and mtstat=#{mtstat,jdbcType=VARCHAR}
+            </if>
+            <if test="pid !=null and pid>0">
+                and pid=#{pid,jdbcType=BIGINT}
+            </if>
+            <if test="expid!=null and expid!=''">
+                and expid=#{expid,jdbcType=VARCHAR}
+            </if>
+            <if test="succ != null">
+            	<if test="succ==1">
+            		and arrive_succ&gt;0
+            	</if>
+            	<if test="succ==-1">
+            		and arrive_fail&gt;0
+            	</if>
+            	<if test="succ==0">
+            		and arrive_fail=0 and arrive_succ=0
+            	</if>
+            </if>
+        </where>
+
+    </sql>
+
+	<sql id="Base_Column_List">
+	    id,senddate,uid,mobile,channel,contentNum,mtstat,expid,content,succ,fail,location,pid,grade,stat,arrive_succ,arrive_fail
+  	</sql>
+
+  	<insert id="insertToSendingBatch" useGeneratedKeys="true" parameterType="java.util.List">
+    insert into sms_user_sending (
+				senddate,
+				uid,
+				mobile,
+				channel,
+				content,
+				content_num,
+				stat,
+				`release`,
+				pid,
+				grade,
+				expid,
+				hisids,
+				location
+	)values
+    <foreach collection="list" item="item" index="index" separator="," >
+        (
+                #{item.senddate,jdbcType=BIGINT},
+                #{item.uid,jdbcType=INTEGER},
+                #{item.mobile,jdbcType=BIGINT},
+                #{item.channel,jdbcType=INTEGER},
+                #{item.content,jdbcType=VARCHAR},
+                #{item.contentNum,jdbcType=INTEGER},
+                0,
+                1,
+                #{item.pid,jdbcType=INTEGER},
+                #{item.grade,jdbcType=INTEGER},
+                #{item.expid,jdbcType=VARCHAR},
+                #{item.hisId,jdbcType=INTEGER},
+                #{item.location,jdbcType=VARCHAR}
+           )
+    </foreach>
+</insert>
+
+    <select id="findByT" parameterType="com.sms.international.admin.model.SmsSendHistory"  resultType="com.sms.international.admin.model.SmsSendHistory">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sms_send_history_unknown
+        <include refid="sendHistory_where"/>
+       <if test="currentPageIndex != null">
+           limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+       </if>
+    </select>
+
+    <select id="findByWhere" parameterType="com.sms.international.admin.model.SmsSendHistory"  resultType="com.sms.international.admin.model.SmsSendHistory">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sms_send_history_unknown
+        <include refid="sendHistory_where"/>
+    </select>
+
+    <select id="findList" parameterType="com.sms.international.admin.model.SmsSendHistory"  resultMap="BaseResultMap">
+        SELECT id,stype,mtype,senddate,uid,mobile,channel,content,contentnum,succ,fail,mtstat,pid,grade,expid,
+        idorder,location,arrive_succ,arrive_fail,stat FROM sms_send_history_unknown
+      <include refid="sendHistory_where"/>
+       limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+    </select>
+
+    <select id="findByIds" parameterType="map"  resultType="com.sms.international.admin.model.SmsSendHistory">
+        SELECT id,stype,mtype,senddate,uid,mobile,channel,content,contentNum,okNum,errorNum,stat,mtstat,pid,grade,expid,rptstat,rpttime,idorder,msgid,location FROM sms_send_history_unknown WHERE
+		id in <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findIds" parameterType="com.sms.international.admin.model.SmsSendHistory"  resultType="java.lang.Integer">
+        SELECT id FROM sms_send_history_unknown <include refid="sendHistory_where"/>
+    </select>
+
+    <select id="countTotal" parameterType="com.sms.international.admin.model.SmsSendHistory" resultType="java.lang.Integer">
+        select count(0) from sms_send_history_unknown
+        <include refid="sendHistory_where"/>
+    </select>
+
+    <select id="findOne" parameterType="java.lang.Integer" resultType="com.sms.international.admin.model.SmsSendHistory">
+        select
+        	<include refid="Base_Column_List"/>
+        from sms_send_history_unknown
+        	WHERE id = #{id}
+    </select>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from sms_send_history_unknown where id=#{id,javaType=INTEGER}
+    </delete>
+
+    <insert id="save" parameterType="com.sms.international.admin.model.SmsSendHistory">
+        <selectKey keyColumn="id" resultType="java.lang.Integer" order="AFTER">
+            select @@IDENTITY
+        </selectKey>
+        insert into sms_send_history_unknown
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+            <if test="senddate!=null and senddate!=''">
+                senddate,
+            </if>
+
+            <if test="sendtime!=null and sendtime!=''">
+                sendtime,
+            </if>
+
+            <if test="uid!=null">
+                uid,
+            </if>
+            <if test="mobile!=null and mobile!=''">
+                mobile,
+            </if>
+            <if test="channel!=null and channel!=''">
+                channel,
+            </if>
+            <if test="content!=null and content!=''">
+                content,
+            </if>
+            <if test="contentNum!=null and contentNum!=''">
+                contentNum,
+            </if>
+            <if test="mobileNum!=null and mobileNum!=''">
+                mobileNum,
+            </if>
+            <if test="stat!=null and stat!=''">
+                stat,
+            </if>
+            <if test="mtstat!=null and mtstat!=''">
+                mtstat,
+            </if>
+            <if test="pid!=null and pid!=''">
+                pid,
+            </if>
+            <if test="expid!=null and expid!=''">
+                expid,
+            </if>
+            <if test="grade!=null and grade!=''">
+                grade,
+            </if>
+            <if test="statTranslate!=null and statTranslate!=''">
+                statTranslate,
+            </if>
+            <if test="channelTranslate!=null and channelTranslate!=''">
+                channelTranslate,
+            </if>
+            <if test="rptstat!=null and rptstat!=''">
+                rptstat,
+            </if>
+            <if test="rpttime!=null and rpttime!=''">
+                rpttime
+            </if>
+        </trim>
+
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+
+            <if test="senddate!=null and senddate!=''">
+              #{senddate,jdbcType=BIGINT},
+            </if>
+
+            <if test="sendtime!=null and sendtime!=''">
+               #{sendtime,jdbcType=BIGINT},
+            </if>
+
+            <if test="uid!=null">
+              #{uid,javaType=INTEGER},
+            </if>
+            <if test="mobile!=null and mobile!=''">
+              #{mobile,jdbcType=VARCHAR},
+            </if>
+            <if test="channel!=null and channel!=''">
+              #{channel,javaType=INTEGER},
+            </if>
+            <if test="content!=null and content!=''">
+              #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="contentNum!=null and contentNum!=''">
+              #{contentNum,javaType=INTEGER},
+            </if>
+            <if test="mobileNum!=null and mobileNum!=''">
+              #{mobileNum,javaType=INTEGER},
+            </if>
+            <if test="stat!=null and stat!=''">
+             #{stat,javaType=INTEGER},
+            </if>
+            <if test="mtstat!=null and mtstat!=''">
+             #{mtstat,jdbcType=VARCHAR},
+            </if>
+            <if test="pid!=null and pid!=''">
+             #{pid,javaType=INTEGER},
+            </if>
+            <if test="expid!=null and expid!=''">
+             #{expid,jdbcType=VARCHAR},
+            </if>
+            <if test="grade!=null and grade!=''">
+             #{grade,jdbcType=VARCHAR},
+            </if>
+            <if test="statTranslate!=null and statTranslate!=''">
+             #{statTranslate,jdbcType=VARCHAR},
+            </if>
+            <if test="channelTranslate!=null and channelTranslate!=''">
+             #{channelTranslate,jdbcType=VARCHAR},
+            </if>
+            <if test="rptstat!=null and rptstat!=''">
+             #{rptstat,jdbcType=VARCHAR},
+            </if>
+            <if test="rpttime!=null and rpttime!=''">
+             #{rpttime,javaType=TIMESTAMP}
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.sms.international.admin.model.SmsSendHistory">
+          update sms_send_history_unknown
+          <set>
+              <if test="senddate!=null and senddate!=''">
+                   senddate = #{senddate,jdbcType=TIMESTAMP},
+              </if>
+
+              <if test="sendtime!=null and sendtime!=''">
+                   sendtime=#{sendtime,jdbcType=TIMESTAMP},
+              </if>
+
+              <if test="uid!=null">
+                   uid=#{uid,javaType=INTEGER},
+              </if>
+              <if test="mobile!=null and mobile!=''">
+                   mobile=#{mobile,jdbcType=VARCHAR},
+              </if>
+              <if test="channel!=null and channel!=''">
+                   channel=#{channel,javaType=INTEGER},
+              </if>
+              <if test="content!=null and content!=''">
+                   content=#{content,jdbcType=VARCHAR},
+              </if>
+              <if test="contentNum!=null and contentNum!=''">
+                   contentNum=#{contentNum,javaType=INTEGER},
+              </if>
+              <if test="mobileNum!=null and mobileNum!=''">
+                   mobileNum=#{mobileNum,javaType=INTEGER},
+              </if>
+              <if test="stat!=null and stat!=''">
+                   stat=#{stat,javaType=INTEGER},
+              </if>
+              <if test="mtstat!=null and mtstat!=''">
+                   mtstat=#{mtstat,jdbcType=VARCHAR},
+              </if>
+              <if test="pid!=null and pid!=''">
+                   pid=#{pid,javaType=INTEGER},
+              </if>
+              <if test="expid!=null and expid!=''">
+                   expid=#{expid,jdbcType=VARCHAR},
+              </if>
+              <if test="grade!=null and grade!=''">
+                   grade=#{grade,jdbcType=VARCHAR},
+              </if>
+              <if test="statTranslate!=null and statTranslate!=''">
+                   statTranslate=#{statTranslate,jdbcType=VARCHAR},
+              </if>
+              <if test="channelTranslate!=null and channelTranslate!=''">
+                   channelTranslate=#{channelTranslate,jdbcType=VARCHAR},
+              </if>
+              <if test="rptstat!=null and rptstat!=''">
+                   rptstat=#{rptstat,jdbcType=VARCHAR},
+              </if>
+              <if test="rpttime!=null and rpttime!=''">
+                   rpttime=#{rpttime,javaType=TIMESTAMP}
+              </if>
+          </set>
+          where id=#{id,jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteByQuery">
+    	delete from sms_send_history_unknown
+    	<include refid="sendHistory_where"/>
+    </delete>
+
+    <delete id="deleteByIds" parameterType="map">
+    	delete from sms_send_history_unknown
+    	where id in
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

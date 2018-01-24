@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sms.international.admin.mapper.SmsUserConsumeMapper">
+    <resultMap id="SmsUserConsume" type="com.sms.international.admin.model.SmsUserConsume">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="uid" jdbcType="INTEGER" property="uid"/>
+        <result column="send" jdbcType="DOUBLE" property="send"/>
+        <result column="unsend" jdbcType="DOUBLE" property="unsend"/>
+        <result column="date" jdbcType="TIMESTAMP" property="date"/>
+        <result column="utype" jdbcType="SMALLINT" property="utype"/>
+    </resultMap>
+
+    <sql id="account_where">
+        <where>
+            <if test="uid !=null">
+                uid = #{uid,jdbcType=INTEGER}
+            </if>
+            <if test="startTime !=null and startTime !=''">
+                and date &gt;=#{startTime}
+            </if>
+            <if test="endTime !=null and endTime !=''">
+                and date &lt;=#{endTime}
+            </if>
+        </where>
+
+    </sql>
+
+    <select id="findByT" parameterType="com.sms.international.admin.model.SmsUserConsume"
+            resultMap="SmsUserConsume">
+        select uid,send,unsend,date,utype from sms_user_consume
+        <include refid="account_where"/>
+        	order by date desc
+        <if test="currentPageIndex != null">
+            limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <select id="countTotal" parameterType="com.sms.international.admin.model.SmsUserConsume" resultType="java.lang.Integer">
+        select count(0) from sms_user_consume
+        <include refid="account_where"/>
+    </select>
+
+</mapper>

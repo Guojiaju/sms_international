@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsChannelPriceMenuMapper">
+    <resultMap id="BaseResultMap" type="com.sms.international.admin.model.SmsChannelPriceMenu">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="country" property="country" jdbcType="VARCHAR"/>
+        <result column="countryId" property="countryId" jdbcType="INTEGER"/>
+        <result column="channelId" property="channelId" jdbcType="INTEGER"/>
+        <result column="price" property="price" jdbcType="DOUBLE"/>
+        <result column="stat" property="stat" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        p.channelId, p.countryId, p.country,p.price, p.stat
+    </sql>
+
+    <sql id="Base_Select_List">
+        <where>
+            <if test="id != null">
+                AND p.id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="country != null and country != ''">
+                AND p.country =#{country,jdbcType=VARCHAR}
+            </if>
+            <if test="countryId != null">
+                AND p.countryId =#{countryId,jdbcType=INTEGER}
+            </if>
+            <if test="channelId != null">
+                AND p.channelId =#{channelId,jdbcType=INTEGER}
+            </if>
+            <if test="price != null">
+                AND p.countryCode =#{countryCode,jdbcType=INTEGER}
+            </if>
+            <if test="stat != null">
+                AND p.stat =#{stat,jdbcType=INTEGER}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findByT" resultMap="BaseResultMap" parameterType="com.sms.international.admin.model.SmsChannelPriceMenu">
+        select p.channelId, p.countryId, p.country,p.price, p.stat
+        from sioo_sms_international.sms_channel_priceMenu p
+        <include refid="Base_Select_List"/>
+        <if test="currentPageIndex != null">
+            limit #{currentPageIndex,javaType=Integer},#{pageSize,javaType=Integer}
+        </if>
+    </select>
+
+    <select id="countTotal" resultType="java.lang.Integer" parameterType="com.sms.international.admin.model.SmsChannelPriceMenu">
+        select count(0)
+        from sioo_sms_international.sms_channel_priceMenu c
+        <include refid="Base_Select_List"/>
+    </select>
+
+    <select id="findByChannelId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select channelId, countryId, country,price, stat
+        from sioo_sms_international.sms_channel_priceMenu
+        where channelId =#{id,jdbcType=INTEGER}
+    </select>
+
+    <insert id="save" parameterType="com.sms.international.admin.model.SmsChannelPriceMenu">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+            SELECT @@IDENTITY
+        </selectKey>
+        insert into sioo_sms_international.sms_channel_priceMenu
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id !=null and id > 0">
+                id,
+            </if>
+            <if test="channelId !=null and channelId > 0">
+                channelId,
+            </if>
+            <if test="countryId !=null and countryId > 0">
+                countryId,
+            </if>
+            <if test="country !=null and country != ''">
+                country,
+            </if>
+            <if test="price !=null">
+                price,
+            </if>
+            <if test="stat !=null">
+                stat,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id !=null and id > 0">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="channelId !=null and channelId > 0">
+                #{channelId,jdbcType=INTEGER},
+            </if>
+            <if test="countryId !=null and countryId > 0">
+                countryId,
+            </if>
+            <if test="country !=null and country != ''">
+                country,
+            </if>
+            <if test="price !=null">
+                price,
+            </if>
+            <if test="stat !=null">
+                stat,
+            </if>
+        </trim>
+    </insert>
+
+    <insert id="batchSave">
+        <selectKey keyColumn="id" resultType="java.lang.Integer" order="AFTER">
+            select @@IDENTITY
+        </selectKey>
+        insert into sioo_sms_international.sms_channel_priceMenu
+        (channelId, countryId, country, price, stat)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.channelId},#{item.countryId},#{item.country},#{item.price},#{item.stat})
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.sms.international.admin.model.SmsChannelPriceMenu">
+        update sioo_sms_international.sms_channel_priceMenu
+        <set>
+            <if test="channelId != null">
+                channelId=#{channelId,jdbcType=INTEGER},
+            </if>
+            <if test="countryId != null">
+                countryId=#{countryId,jdbcType=INTEGER},
+            </if>
+            <if test="country != null and country != ''">
+                country=#{country,jdbcType=VARCHAR},
+            </if>
+            <if test="price != null">
+                price=#{price,jdbcType=DOUBLE},
+            </if>
+            <if test="stat != null">
+                stat= #{stat,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,javaType=INTEGER}
+    </update>
+
+    <delete id="deleteByChannelId" parameterType="java.lang.Integer">
+        delete from sioo_sms_international.sms_channel_priceMenu
+        where channelId =#{id,jdbcType=VARCHAR}
+    </delete>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from sioo_sms_international.sms_channel_priceMenu
+        where id =#{id,jdbcType=VARCHAR}
+    </delete>
+
+    <delete id="emptyTempPrice">
+        delete from sioo_sms_international.sms_temp_priceMenu
+    </delete>
+
+    <insert id="batchSaveTemp">
+        insert into sioo_sms_international.sms_temp_priceMenu(countryId,country,channelId,price)
+        select countryId,country,channelId,min(price) from sioo_sms_international.sms_channel_priceMenu where stat =0 group by countryId
+    </insert>
+</mapper>

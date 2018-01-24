@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsUserControlMapper">
+    <resultMap id="BaseResultMap" type="com.sms.international.admin.model.SmsUserControl">
+        <result column="uid" property="uid" jdbcType="INTEGER"/>
+        <result column="isShowRpt" property="isShowRpt" jdbcType="INTEGER"/>
+        <result column="childFun" property="childFun" jdbcType="INTEGER"/>
+        <result column="childNum" property="childNum" jdbcType="INTEGER"/>
+        <result column="isRelease" property="isRelease" jdbcType="INTEGER"/>
+        <result column="releaseNum" property="releaseNum" jdbcType="INTEGER"/>
+        <result column="repeatFilter" property="repeatFilter" jdbcType="INTEGER"/>
+        <result column="repeatNum" property="repeatNum" jdbcType="INTEGER"/>
+        <result column="signPosition" property="signPosition" jdbcType="INTEGER"/>
+        <result column="expidSign" property="expidSign" jdbcType="INTEGER"/>
+        <result column="proxyIp" property="proxyIp" jdbcType="VARCHAR"/>
+        <result column="submitType" property="submitType" jdbcType="INTEGER"/>
+        <result column="speed" property="speed" jdbcType="INTEGER"/>
+        <result column="blackAll" property="blackAll" jdbcType="INTEGER"/>
+        <result column="repeatSign" property="repeatSign" jdbcType="INTEGER"/>
+        <result column="repeatSignNum" property="repeatSignNum" jdbcType="INTEGER"/>
+        <result column="channelId" property="channelId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        uid, isShowRpt,childFun,childNum,isRelease,releaseNum,repeatFilter,repeatNum,signPosition,
+        expidSign,proxyIp,submitType,speed,blackAll,repeatSign,repeatSignNum,channelId
+    </sql>
+
+    <select id="findByUid" resultMap="BaseResultMap" parameterType="com.sms.international.admin.model.SmsUserControl">
+        select
+        <include refid="Base_Column_List" />
+        from sioo_sms_international.sms_user_control p
+        where uid = #{uid,javaType=INTEGER}
+    </select>
+
+    <insert id="save" parameterType="com.sms.international.admin.model.SmsUserControl">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+            SELECT @@IDENTITY
+        </selectKey>
+        insert into sioo_sms_international.sms_user_control
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="uid !=null and uid > 0">
+                uid,
+            </if>
+            <if test="isShowRpt !=null">
+                isShowRpt,
+            </if>
+            <if test="childFun !=null">
+                childFun,
+            </if>
+            <if test="childNum !=null">
+                childNum,
+            </if>
+            <if test="isRelease !=null">
+                isRelease,
+            </if>
+            <if test="releaseNum !=null">
+                releaseNum,
+            </if>
+            <if test="repeatFilter !=null">
+                repeatFilter,
+            </if>
+            <if test="repeatNum !=null">
+                repeatNum,
+            </if>
+            <if test="signPosition !=null">
+                signPosition,
+            </if>
+            <if test="expidSign !=null">
+                expidSign,
+            </if>
+            <if test="proxyIp !=null and proxyIp != ''">
+                proxyIp,
+            </if>
+            <if test="submitType !=null">
+                submitType,
+            </if>
+            <if test="speed !=null">
+                speed,
+            </if>
+            <if test="blackAll !=null">
+                blackAll,
+            </if>
+            <if test="repeatSign !=null">
+                repeatSign,
+            </if>
+            <if test="repeatSignNum !=null">
+                repeatSignNum,
+            </if>
+            <if test="channelId !=null">
+                channelId,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="uid !=null and uid > 0">
+                #{uid,jdbcType=INTEGER},
+            </if>
+            <if test="isShowRpt !=null">
+                #{isShowRpt,jdbcType=INTEGER},
+            </if>
+            <if test="childFun !=null">
+                #{childFun,jdbcType=INTEGER},
+            </if>
+            <if test="childNum !=null">
+                #{childNum,jdbcType=INTEGER},
+            </if>
+            <if test="isRelease !=null">
+                #{isRelease,jdbcType=INTEGER},
+            </if>
+            <if test="releaseNum !=null">
+                #{releaseNum,jdbcType=INTEGER},
+            </if>
+            <if test="repeatFilter !=null">
+                #{repeatFilter,jdbcType=INTEGER},
+            </if>
+            <if test="repeatNum !=null">
+                #{repeatNum,jdbcType=INTEGER},
+            </if>
+            <if test="signPosition !=null">
+                #{signPosition,jdbcType=INTEGER},
+            </if>
+            <if test="expidSign !=null">
+                #{expidSign,jdbcType=INTEGER},
+            </if>
+            <if test="proxyIp !=null and proxyIp != ''">
+                #{proxyIp,jdbcType=VARCHAR},
+            </if>
+            <if test="submitType !=null">
+                #{submitType,jdbcType=INTEGER},
+            </if>
+            <if test="speed !=null">
+                #{speed,jdbcType=VARCHAR},
+            </if>
+            <if test="blackAll !=null">
+                #{blackAll,jdbcType=VARCHAR},
+            </if>
+            <if test="repeatSign !=null">
+                #{repeatSign,jdbcType=VARCHAR},
+            </if>
+            <if test="repeatSignNum !=null">
+                #{repeatSignNum,jdbcType=VARCHAR},
+            </if>
+            <if test="channelId !=null">
+                #{channelId,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="update" parameterType="com.sms.international.admin.model.SmsUserControl">
+        update sioo_sms_international.sms_user_control
+        <set>
+            <if test="isShowRpt !=null">
+                isShowRpt =#{isShowRpt,jdbcType=INTEGER},
+            </if>
+            <if test="childFun !=null">
+                childFun =#{childFun,jdbcType=INTEGER},
+            </if>
+            <if test="childNum !=null">
+                childNum =#{childNum,jdbcType=INTEGER},
+            </if>
+            <if test="isRelease !=null">
+                isRelease =#{isRelease,jdbcType=INTEGER},
+            </if>
+            <if test="releaseNum !=null">
+                releaseNum=#{releaseNum,jdbcType=INTEGER},
+            </if>
+            <if test="repeatFilter !=null">
+                repeatFilter=#{repeatFilter,jdbcType=INTEGER},
+            </if>
+            <if test="repeatNum !=null">
+                repeatNum=#{repeatNum,jdbcType=INTEGER},
+            </if>
+            <if test="signPosition !=null">
+                signPosition=#{signPosition,jdbcType=INTEGER},
+            </if>
+            <if test="expidSign !=null">
+                expidSign=#{expidSign,jdbcType=INTEGER},
+            </if>
+            <if test="proxyIp !=null and proxyIp != ''">
+                proxyIp=#{proxyIp,jdbcType=VARCHAR},
+            </if>
+            <if test="submitType !=null">
+                submitType=#{submitType,jdbcType=INTEGER},
+            </if>
+            <if test="speed !=null">
+                speed=#{speed,jdbcType=VARCHAR},
+            </if>
+            <if test="blackAll !=null">
+                blackAll=#{blackAll,jdbcType=VARCHAR},
+            </if>
+            <if test="repeatSign !=null">
+                repeatSign=#{repeatSign,jdbcType=VARCHAR},
+            </if>
+            <if test="repeatSignNum !=null">
+                repeatSignNum=#{repeatSignNum,jdbcType=VARCHAR},
+            </if>
+            <if test="channelId !=null">
+                channelId=#{channelId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where uid = #{uid,javaType=INTEGER}
+    </update>
+</mapper>

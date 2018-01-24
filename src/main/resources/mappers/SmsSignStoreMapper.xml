@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsSignStoreMapper">
+    <resultMap type="com.sms.international.admin.model.SmsSignStore" id="baseResultMap">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="uid" property="uid" jdbcType="INTEGER"/>
+        <result column="store" property="store" jdbcType="VARCHAR"/>
+        <result column="expend" property="expend" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="signtime" property="signtime" jdbcType="VARCHAR"/>
+        <result column="addtime" property="addtime" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="channel" property="channel" jdbcType="INTEGER"/>
+        <result column="expendqd" property="expendqd" jdbcType="VARCHAR"/>
+        <result column="expend2" property="expend2" jdbcType="VARCHAR"/>
+        <result column="userexpend" property="userexpend" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="user_Where">
+        <where>
+            <if test="id != null">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="uid != null">
+                and uid = #{uid,jdbcType=INTEGER}
+            </if>
+            <if test="store != null and store != ''">
+                and store LIKE CONCAT(CONCAT('%', #{store,jdbcType=VARCHAR}), '%')
+            </if>
+            <if test="expend != null and expend != ''">
+                and expend = #{expend,jdbcType=VARCHAR}
+            </if>
+            <if test="status != null">
+                and status = #{status,jdbcType=INTEGER}
+            </if>
+            <if test="type != null">
+                and type =#{type,jdbcType=INTEGER}
+            </if>
+            <if test="channel !=null and channel>0">
+                and channel=#{channel,jdbcType=INTEGER}
+            </if>
+            <if test="addtime != null and addtime != '' ">
+                and addtime like CONCAT(CONCAT('%', #{addtime,jdbcType=VARCHAR}), '%')
+            </if>
+        </where>
+    </sql>
+
+    <insert id="save" parameterType="com.sms.international.admin.model.SmsSignStore">
+    	<selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT @@IDENTITY
+        </selectKey>
+        insert into sms_user_signstore
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uid!=null">
+                uid,
+            </if>
+            <if test="store!=null and store != null">
+                store,
+            </if>
+            <if test="expend!=null">
+                expend,
+            </if>
+            <if test="userexpend!=null">
+                userexpend,
+            </if>
+            <if test="status!=null">
+                status,
+            </if>
+            <if test="userstat!=null">
+                userstat,
+            </if>
+            <if test="signtime!=null and signtime != ''">
+                signtime,
+            </if>
+            <if test="addtime!=null and addtime !=''">
+                addtime,
+            </if>
+            <if test="type!=null">
+                type,
+            </if>
+            <if test="channel!=null">
+                channel
+            </if>
+        </trim>
+
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="uid!=null">
+                #{uid,javaType=INTEGER},
+            </if>
+            <if test="store!=null and store != null">
+                #{store,jdbcType=VARCHAR},
+            </if>
+            <if test="expend!=null">
+                #{expend,jdbcType=VARCHAR},
+            </if>
+            <if test="userexpend!=null">
+                #{userexpend,jdbcType=VARCHAR},
+            </if>
+            <if test="status!=null">
+                #{status,javaType=INTEGER},
+            </if>
+            <if test="userstat!=null">
+                #{userstat,jdbcType=SMALLINT},
+            </if>
+            <if test="signtime!=null and signtime != ''">
+                #{signtime,jdbcType=VARCHAR},
+            </if>
+            <if test="addtime!=null and addtime !=''">
+                #{addtime,jdbcType=VARCHAR},
+            </if>
+            <if test="type!=null">
+                #{type,javaType=INTEGER},
+            </if>
+            <if test="channel!=null">
+                #{channel,javaType=INTEGER}
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.sms.international.admin.model.SmsSignStore">
+        update sms_user_signstore
+        <set>
+            <if test="uid != null">
+                uid = #{uid,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="store != null and store != ''">
+                store = trim(#{store,jdbcType=VARCHAR}),
+            </if>
+            <if test="expend != null and expend != ''">
+                expend = trim(#{expend,jdbcType=VARCHAR}),
+            </if>
+            <if test="signtime != null">
+                signtime = #{signtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="addtime != null and addtime != ''">
+                addtime = #{addtime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="registerBySearch" parameterType="com.sms.international.admin.model.SmsSignStore">
+        update sms_user_signstore set status=1
+        <include refid="user_Where"/>
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        DELETE FROM sms_user_signstore
+        WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <select id="findOne" parameterType="java.lang.Integer" resultMap="baseResultMap">
+        select id,uid,store,expend,status,userstat,signtime,addtime,userexpend,type from sms_user_signstore
+         where id=#{id}
+    </select>
+
+    <select id="findOneByT" parameterType="com.sms.international.admin.model.SmsSignStore" resultMap="baseResultMap">
+        select id,uid,store,expend,status,userstat,signtime,addtime,userexpend,type from sms_user_signstore
+        <include refid="user_Where"></include>
+        order by addtime desc
+    </select>
+
+    <select id="findByT" parameterType="com.sms.international.admin.model.SmsSignStore" resultMap="baseResultMap">
+        select id,uid,store,expend,status,userstat,signtime,addtime,userexpend,type from sms_user_signstore
+         <include refid="user_Where"></include>
+         order by addtime desc
+        <if test="currentPageIndex != null">
+            limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <select id="countTotal" parameterType="com.sms.international.admin.model.SmsSignStore" resultType="java.lang.Integer">
+        select count(0) from sms_user_signstore
+        <include refid="user_Where"/>
+    </select>
+    
+    <select id="findByUidAndExpend" resultMap="baseResultMap" parameterType="java.lang.Integer">
+    	select id,uid,store,expend,status,userstat,signtime,addtime,userexpend,type from sms_user_signstore
+    	where uid = #{uid,jdbcType=INTEGER} and expend =#{uid,jdbcType=INTEGER} and type =2
+    </select>
+
+    <delete id="batchRemove" parameterType="java.lang.String">
+        delete from sms_user_signstore where id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="removeByT" parameterType="com.sms.international.admin.model.SmsSignStore">
+        DELETE FROM sms_user_signstore
+        <include refid="user_Where"/>
+    </delete>
+</mapper>

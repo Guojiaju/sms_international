@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsCountryInfosMapper">
+    <resultMap id="BaseResultMap" type="com.sms.international.admin.model.SmsCountryInfos">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="country" property="country" jdbcType="VARCHAR"/>
+        <result column="country_en" property="country_en" jdbcType="VARCHAR"/>
+        <result column="country_ab" property="country_ab" jdbcType="INTEGER"/>
+        <result column="countryCode" property="countryCode" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, country, country_en,country_ab, countryCode
+    </sql>
+
+    <sql id="Base_Select_List">
+        <where>
+            <if test="id != null">
+                AND id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="country != null and country != ''">
+                AND country =#{country,jdbcType=VARCHAR}
+            </if>
+            <if test="country_en != null and country_en != ''">
+                AND country_en =#{country_en,jdbcType=VARCHAR}
+            </if>
+            <if test="country_ab != null and country_ab != ''">
+                AND country_ab =#{country_ab,jdbcType=VARCHAR}
+            </if>
+            <if test="countryCode != null and countryCode != ''">
+                AND countryCode =#{countryCode,jdbcType=INTEGER}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findByT" resultMap="BaseResultMap" parameterType="com.sms.international.admin.model.SmsCountryInfos">
+        select id, country, country_en,country_ab, countryCode
+        from sioo_sms_international.sms_country_infos
+        <include refid="Base_Select_List"/>
+        order by CONVERT (country using gbk) ASC
+        <if test="currentPageIndex != null">
+            limit #{currentPageIndex,javaType=Integer},#{pageSize,javaType=Integer}
+        </if>
+    </select>
+
+    <select id="countTotal" resultType="java.lang.Integer" parameterType="com.sms.international.admin.model.SmsCountryInfos">
+        select count(0)
+        from sioo_sms_international.sms_country_infos
+        <include refid="Base_Select_List"/>
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap" parameterType="com.sms.international.admin.model.SmsCountryInfos">
+        select id, country, country_en,country_ab, countryCode
+        from sioo_sms_international.sms_country_infos
+        order by CONVERT (country using gbk) ASC
+    </select>
+
+    <select id="findOne" resultMap="BaseResultMap" parameterType="com.sms.international.admin.model.SmsCountryInfos">
+        select id, country, country_en,country_ab, countryCode
+        from sioo_sms_international.sms_country_infos
+        <include refid="Base_Select_List" />
+    </select>
+</mapper>

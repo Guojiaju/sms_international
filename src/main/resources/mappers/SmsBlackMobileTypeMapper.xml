@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.international.admin.mapper.SmsBlackMobileTypeMapper">
+    <resultMap type="com.sms.international.admin.model.SmsBlackMobileType" id="baseResultMap">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="level" property="level" jdbcType="INTEGER"/>
+        <result column="createdDate" property="createdDate" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="where">
+        <where>
+            <if test="id != null">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="name != null and name != ''">
+                and name = trim(#{name,jdbcType=VARCHAR})
+            </if>
+            <if test="level != null">
+                and level = #{level,jdbcType=VARCHAR}
+            </if>
+            <if test="createdDate != null and createdDate != ''">
+                and createdDate = #{createdDate,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+    </sql>
+
+    <insert id="save" parameterType="com.sms.international.admin.model.SmsBlackMobileType">
+        <selectKey keyColumn="id" resultType="java.lang.Integer" order="AFTER">
+            select @@IDENTITY
+        </selectKey>
+        insert into sms_black_mobile_type
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">
+                name,
+            </if>
+            <if test="level != null">
+                level,
+            </if>
+            <if test="createdDate != null and createdDate != ''">
+                createdDate,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and  name != ''">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="level != null">
+                #{level,jdbcType=INTEGER},
+            </if>
+            <if test="createdDate != null and createdDate != ''">
+                #{createdDate,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.sms.international.admin.model.SmsBlackMobileType">
+        update sms_black_mobile_type
+        <set>
+            <if test="name != null and name != ''">
+                name = trim(#{name,jdbcType=VARCHAR}),
+            </if>
+            <if test="level != null">
+                level = #{level,jdbcType=INTEGER},
+            </if>
+            <if test="createdDate != null and createdDate != ''">
+                createdDate = #{createdDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        DELETE FROM sms_black_mobile_type
+        WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <select id="findByT" parameterType="com.sms.international.admin.model.SmsBlackMobileType" resultMap="baseResultMap">
+        select id,name,level,createdDate from sms_black_mobile_type
+        <include refid="where"></include>
+        order by level
+        <if test="currentPageIndex != null">
+            limit #{currentPageIndex,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <select id="getAll" resultMap="baseResultMap">
+        select id,name,level,createdDate from sms_black_mobile_type
+    </select>
+
+    <select id="countTotal" parameterType="com.sms.international.admin.model.SmsBlackMobileType" resultType="java.lang.Integer">
+        select count(0) from sms_black_mobile_type
+        <include refid="where"></include>
+    </select>
+
+    <select id="findOne" parameterType="com.sms.international.admin.model.SmsBlackMobileType" resultType="com.sms.international.admin.model.SmsBlackMobileType">
+        select id,name,level,createdDate from sms_black_mobile_type
+        where id =#{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="findOneByWhere" parameterType="com.sms.international.admin.model.SmsBlackMobileType" resultType="com.sms.international.admin.model.SmsBlackMobileType">
+        select id,name,level,createdDate from sms_black_mobile_type
+        <include refid="where"></include>
+    </select>
+</mapper>
